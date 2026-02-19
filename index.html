@@ -54,6 +54,21 @@
             font-weight: 700;
         }
 
+        .time-wrapper {
+            display: flex;
+            direction: ltr; 
+            align-items: center;
+        }
+
+        /* تعديل حل مشكلة قلب الأرقام */
+        .h-part, .m-part {
+            display: inline-block;
+            direction: ltr; /* تم التعديل هنا لضمان كتابة 20 فتظهر 20 */
+            unicode-bidi: isolate; /* تمنع التداخل مع اتجاه الصفحة العام */
+            outline: none;
+            min-width: 5px;
+        }
+
         .battery-side {
             display: flex;
             align-items: center;
@@ -78,6 +93,9 @@
             text-align: center;
             color: white;
             margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .clock-container h1 {
             font-size: 75px;
@@ -120,7 +138,6 @@
             line-height: 1.6;
         }
 
-        /* توحيد الخط للمقادير والارقام لتبدو كجزء من النص */
         .black-text { 
             color: inherit; 
             font-weight: inherit; 
@@ -162,7 +179,14 @@
 
     <div class="phone" id="phoneArea">
         <div class="status-bar">
-            <div class="time-side"><span class="editable" contenteditable="true" id="time-top">١١:٣٣</span></div>
+            <div class="time-side">
+                <div class="time-wrapper">
+                    <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
+                    <span style="user-select: none; margin: 0 1px;">:</span>
+                    <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
+                </div>
+            </div>
+            
             <div class="battery-side">
                 <div class="battery-box"><div class="battery-fill" id="battery-level"></div></div>
                 <span class="editable" contenteditable="true" id="battery-text">٨٨٪</span>
@@ -172,7 +196,13 @@
         </div>
 
         <div class="clock-container">
-            <h1 class="editable" contenteditable="true" id="time-big">١١:٣٣</h1>
+            <h1>
+                <div class="time-wrapper">
+                    <span class="editable h-part" contenteditable="true" id="h-big" oninput="syncTime('h', this)">١١</span>
+                    <span style="user-select: none;">:</span>
+                    <span class="editable m-part" contenteditable="true" id="m-big" oninput="syncTime('m', this)">٣٣</span>
+                </div>
+            </h1>
             <p class="editable" contenteditable="true" id="date-text">الأربعاء، ٢٤ مايو</p>
         </div>
 
@@ -213,9 +243,22 @@
         let isDragging = false;
         let pressTimer;
 
+        function syncTime(type, el) {
+            const val = el.innerText;
+            if (type === 'h') {
+                document.getElementById('h-top').innerText = val;
+                document.getElementById('h-big').innerText = val;
+            } else {
+                document.getElementById('m-top').innerText = val;
+                document.getElementById('m-big').innerText = val;
+            }
+            saveData();
+        }
+
         function saveData() {
             const data = {
-                time: document.getElementById('time-top').innerText,
+                hours: document.getElementById('h-top').innerText,
+                minutes: document.getElementById('m-top').innerText,
                 battery: document.getElementById('battery-text').innerText,
                 date: document.getElementById('date-text').innerText,
                 amount: document.getElementById('amount').innerText,
@@ -230,7 +273,8 @@
             const saved = localStorage.getItem('hyperos_data');
             if (saved) {
                 const data = JSON.parse(saved);
-                document.getElementById('time-top').innerText = document.getElementById('time-big').innerText = data.time;
+                document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = data.hours || "١١";
+                document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = data.minutes || "٣٣";
                 document.getElementById('battery-text').innerText = data.battery;
                 document.getElementById('date-text').innerText = data.date;
                 document.getElementById('amount').innerText = data.amount;
@@ -242,8 +286,8 @@
         }
 
         const resetToDefault = () => {
-            document.getElementById('time-top').innerText = "١١:٣٣";
-            document.getElementById('time-big').innerText = "١١:٣٣";
+            document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
+            document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
             document.getElementById('battery-text').innerText = "٨٨٪";
             document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
             document.getElementById('amount').innerText = "200";
@@ -288,15 +332,11 @@
             document.getElementById('battery-level').style.width = Math.min(val, 100) + '%';
         }
 
-        document.querySelectorAll('.editable').forEach(el => {
-            el.addEventListener('input', () => {
-                if(el.id === 'time-top' || el.id === 'time-big') {
-                    document.getElementById('time-top').innerText = document.getElementById('time-big').innerText = el.innerText;
-                }
-                updateBattery();
-                saveData();
-            });
-        });
+        document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
+        document.getElementById('date-text').addEventListener('input', saveData);
+        document.getElementById('amount').addEventListener('input', saveData);
+        document.getElementById('phone-num').addEventListener('input', saveData);
+        document.getElementById('fees').addEventListener('input', saveData);
 
         window.onload = loadData;
     </script>
