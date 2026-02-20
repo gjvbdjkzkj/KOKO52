@@ -1,1 +1,372 @@
-سثقصققصب
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HyperOS UI - Pro Edition</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <style>
+        :root { --miui-blur: blur(25px); }
+        
+        /* أهم تعديل لمنع التحديث Pull-to-Refresh */
+        html, body {
+            overscroll-behavior-y: none !important;
+            overscroll-behavior: none !important;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden !important;
+            position: fixed; /* يمنع الصفحة من الحركة تماماً */
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-touch-callout: none; 
+            user-select: none; 
+            touch-action: none; 
+        }
+
+        .editable, input { 
+            user-select: text !important; 
+            -webkit-user-select: text !important;
+            touch-action: auto !important;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone {
+            width: 400px;  
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000') center/cover;
+            position: relative;
+            box-shadow: 0 0 80px rgba(0,0,0,0.8);
+            overflow: hidden;
+            /* منع التحديث داخل منطقة التلفون */
+            overscroll-behavior-y: none;
+        }
+
+        .status-bar {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            padding: 15px 25px 5px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .time-wrapper {
+            display: flex;
+            direction: ltr; 
+            align-items: center;
+        }
+
+        .h-part, .m-part {
+            display: inline-block;
+            direction: ltr;
+            unicode-bidi: isolate;
+            outline: none;
+            min-width: 5px;
+        }
+
+        .battery-side {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .battery-box {
+            width: 22px; height: 10px;
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 2px;
+            padding: 1px;
+            display: flex;
+            align-items: center;
+        }
+        .battery-fill { 
+            height: 100%; 
+            background: white; 
+            width: 88%;
+            transition: width 0.3s ease;
+        }
+
+        .clock-container {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .clock-container h1 {
+            font-size: 75px;
+            font-weight: 200;
+            margin: 0;
+            line-height: 1;
+        }
+        .clock-container p { font-size: 14px; opacity: 0.8; margin-top: 8px; }
+
+        .google-bar {
+            width: 90%;
+            margin: 30px auto;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            z-index: 5;
+        }
+
+        .ussd-box {
+            position: absolute;
+            bottom: 80px; 
+            left: 15px; right: 15px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 1000;
+            touch-action: none;
+        }
+        
+        .ussd-body { 
+            text-align: right; 
+            margin: 15px 0; 
+            font-size: 16px; 
+            color: #000; 
+            line-height: 1.6;
+        }
+
+        .black-text { 
+            color: inherit; 
+            font-weight: inherit; 
+            display: inline-block;
+            outline: none;
+        }
+
+        .ussd-input {
+            width: 100%; border: none; border-bottom: 2px solid #1a73e8;
+            padding: 10px; text-align: right; outline: none;
+            background: #f8f9fa; margin-bottom: 20px;
+        }
+
+        .ussd-actions { display: flex; gap: 10px; }
+        .u-btn { flex: 1; padding: 14px; border-radius: 25px; border: none; font-weight: 800; cursor: pointer; }
+        .u-cancel { background: #f1f3f4; color: #5f6368; cursor: ns-resize; touch-action: none; }
+        .u-send { background: #1a73e8; color: #fff; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px 25px;
+        }
+        .app { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .icon-sq { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; }
+        .app-text { color: white; font-size: 10px; font-weight: 600; }
+
+        .nav-bar {
+            position: absolute; bottom: 0; width: 100%; height: 60px;
+            display: flex; justify-content: space-around; align-items: center; padding: 0 70px;
+        }
+        .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
+
+        [contenteditable="true"]:focus { background: transparent; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div class="phone" id="phoneArea">
+        <div class="status-bar">
+            <div class="time-side">
+                <div class="time-wrapper">
+                    <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
+                    <span style="user-select: none; margin: 0 1px;">:</span>
+                    <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
+                </div>
+            </div>
+            
+            <div class="battery-side">
+                <div class="battery-box"><div class="battery-fill" id="battery-level"></div></div>
+                <span class="editable" contenteditable="true" id="battery-text">٨٨٪</span>
+                <i class="fas fa-signal" style="font-size: 10px;"></i>
+                <i class="fas fa-wifi" style="font-size: 10px;"></i>
+            </div>
+        </div>
+
+        <div class="clock-container">
+            <h1>
+                <div class="time-wrapper">
+                    <span class="editable h-part" contenteditable="true" id="h-big" oninput="syncTime('h', this)">١١</span>
+                    <span style="user-select: none;">:</span>
+                    <span class="editable m-part" contenteditable="true" id="m-big" oninput="syncTime('m', this)">٣٣</span>
+                </div>
+            </h1>
+            <p class="editable" contenteditable="true" id="date-text">الأربعاء، ٢٤ مايو</p>
+        </div>
+
+        <div class="google-bar" id="googleBar"><span class="google-text" style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
+
+        <div class="grid">
+            <div class="app"><div class="icon-sq" style="background:#25D366"><i class="fab fa-whatsapp"></i></div><span class="app-text">واتساب</span></div>
+            <div class="app"><div class="icon-sq" style="background:#1877F2"><i class="fab fa-facebook"></i></div><span class="app-text">فيسبوك</span></div>
+            <div class="app"><div class="icon-sq" style="background:#0088cc"><i class="fab fa-telegram"></i></div><span class="app-text">تيليجرام</span></div>
+            <div class="app" id="youtubeApp"><div class="icon-sq" style="background:#FF0000"><i class="fab fa-youtube"></i></div><span class="app-text">يوتيوب</span></div>
+        </div>
+
+        <div class="ussd-box" id="ussdBox">
+            <div class="ussd-head" style="display: flex; justify-content: space-between;"><span class="sim-2">SIM 2</span></div>
+            <div class="ussd-body" id="ussdContent">
+                تم تحويل <span class="black-text editable" contenteditable="true" id="amount">500</span> جنيه لرقم <span class="black-text editable" contenteditable="true" id="phone-num">01036543568</span>
+                <br> مصاريف الخدمة <span class="black-text editable" contenteditable="true" id="fees">3</span> جنيه . اطلب #9* و اشحن
+            </div>
+            <input type="text" class="ussd-input">
+            <div class="ussd-actions">
+                <button class="u-btn u-cancel" id="btnCancel">Cancel</button>
+                <button class="u-btn u-send" id="btnSend">Send</button>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-shape" style="border-radius:3px"></div>
+            <div class="nav-shape" style="border-radius:50%"></div>
+            <div class="nav-shape" style="border:none; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(45deg); width:13px; height:13px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const ussdBox = document.getElementById('ussdBox');
+        const googleBar = document.getElementById('googleBar');
+        const btnCancel = document.getElementById('btnCancel');
+        const phoneArea = document.getElementById('phoneArea');
+        let isDragging = false;
+
+        function syncTime(type, el) {
+            const val = el.innerText;
+            if (type === 'h') {
+                document.getElementById('h-top').innerText = val;
+                document.getElementById('h-big').innerText = val;
+            } else {
+                document.getElementById('m-top').innerText = val;
+                document.getElementById('m-big').innerText = val;
+            }
+            saveData();
+        }
+
+        function saveData() {
+            const data = {
+                hours: document.getElementById('h-top').innerText,
+                minutes: document.getElementById('m-top').innerText,
+                battery: document.getElementById('battery-text').innerText,
+                date: document.getElementById('date-text').innerText,
+                amount: document.getElementById('amount').innerText,
+                phone: document.getElementById('phone-num').innerText,
+                fees: document.getElementById('fees').innerText,
+                bottomPos: ussdBox.style.bottom
+            };
+            localStorage.setItem('hyperos_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('hyperos_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = data.hours || "١١";
+                document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = data.minutes || "٣٣";
+                document.getElementById('battery-text').innerText = data.battery;
+                document.getElementById('date-text').innerText = data.date;
+                document.getElementById('amount').innerText = data.amount;
+                document.getElementById('phone-num').innerText = data.phone;
+                document.getElementById('fees').innerText = data.fees;
+                ussdBox.style.bottom = data.bottomPos || '80px';
+                updateBattery();
+            }
+        }
+
+        const startDrag = (e) => { 
+            isDragging = true; 
+            ussdBox.style.transition = 'none'; 
+        };
+        
+        const stopDrag = () => { 
+            isDragging = false; 
+            ussdBox.style.transition = 'bottom 0.1s ease-out'; 
+            saveData(); 
+        };
+
+        btnCancel.addEventListener('mousedown', startDrag);
+        btnCancel.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchend', stopDrag);
+
+        const handleMove = (e) => {
+            if (!isDragging) return;
+            
+            // منع أي حركة للمتصفح نهائياً أثناء السحب
+            e.preventDefault();
+
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let phoneRect = phoneArea.getBoundingClientRect();
+            let googleRect = googleBar.getBoundingClientRect();
+            
+            // حساب السقف بناءً على موقع شريط جوجل
+            // السقف = طول الهاتف - بعد جوجل عن الأعلى - طول المربع
+            let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
+            let newBottom = phoneRect.bottom - clientY - 30; 
+
+            if (newBottom < 20) newBottom = 20;
+            if (newBottom > maxBottom) newBottom = maxBottom;
+
+            ussdBox.style.bottom = newBottom + 'px';
+        };
+
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', handleMove, { passive: false });
+
+        // منع القفز عند ظهور الكيبورد
+        const lockPosition = () => {
+            let phoneRect = phoneArea.getBoundingClientRect();
+            let googleRect = googleBar.getBoundingClientRect();
+            let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
+            
+            let currentBottom = parseInt(ussdBox.style.bottom);
+            if (currentBottom > maxBottom) {
+                ussdBox.style.bottom = maxBottom + 'px';
+            }
+        };
+
+        window.addEventListener('resize', lockPosition);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', lockPosition);
+            window.visualViewport.addEventListener('scroll', lockPosition);
+        }
+
+        function updateBattery() {
+            let text = document.getElementById('battery-text').innerText;
+            let percent = text.replace(/[^0-9٠-٩]/g, '').replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+            let val = parseInt(percent) || 0;
+            document.getElementById('battery-level').style.width = Math.min(val, 100) + '%';
+        }
+
+        document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
+        document.querySelectorAll('.editable').forEach(el => el.addEventListener('input', saveData));
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
