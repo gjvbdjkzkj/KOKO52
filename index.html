@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HyperOS UI - Pro Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;700;900&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
         .editable, input { 
             user-select: text !important; 
             -webkit-user-select: text !important;
+            touch-action: auto !important;
         }
         
         body {
@@ -60,11 +61,10 @@
             align-items: center;
         }
 
-        /* تعديل حل مشكلة قلب الأرقام */
         .h-part, .m-part {
             display: inline-block;
-            direction: ltr; /* تم التعديل هنا لضمان كتابة 20 فتظهر 20 */
-            unicode-bidi: isolate; /* تمنع التداخل مع اتجاه الصفحة العام */
+            direction: ltr;
+            unicode-bidi: isolate;
             outline: none;
             min-width: 5px;
         }
@@ -128,6 +128,7 @@
             padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             z-index: 1000;
+            touch-action: none; 
         }
         
         .ussd-body { 
@@ -206,7 +207,7 @@
             <p class="editable" contenteditable="true" id="date-text">الأربعاء، ٢٤ مايو</p>
         </div>
 
-        <div class="google-bar"><span class="google-text" style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
+        <div class="google-bar" id="googleBar"><span class="google-text" style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
 
         <div class="grid">
             <div class="app"><div class="icon-sq" style="background:#25D366"><i class="fab fa-whatsapp"></i></div><span class="app-text">واتساب</span></div>
@@ -237,12 +238,13 @@
 
     <script>
         const ussdBox = document.getElementById('ussdBox');
+        const googleBar = document.getElementById('googleBar');
         const btnCancel = document.getElementById('btnCancel');
-        const btnSend = document.getElementById('btnSend');
-        const youtubeApp = document.getElementById('youtubeApp');
+        const phoneArea = document.getElementById('phoneArea');
         let isDragging = false;
         let pressTimer;
 
+        // دالة المزامنة والبيانات
         function syncTime(type, el) {
             const val = el.innerText;
             if (type === 'h') {
@@ -290,20 +292,24 @@
             document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
             document.getElementById('battery-text').innerText = "٨٨٪";
             document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
-            document.getElementById('amount').innerText = "200";
+            document.getElementById('amount').innerText = "500";
             document.getElementById('phone-num').innerText = "01036543568";
-            document.getElementById('fees').innerText = "1";
+            document.getElementById('fees').innerText = "3";
             updateBattery();
             saveData();
         };
 
-        youtubeApp.onmousedown = () => { pressTimer = setTimeout(resetToDefault, 2000); };
-        youtubeApp.onmouseup = () => clearTimeout(pressTimer);
-        youtubeApp.ontouchstart = () => { pressTimer = setTimeout(resetToDefault, 2000); };
-        youtubeApp.ontouchend = () => clearTimeout(pressTimer);
-
-        const startDrag = () => { isDragging = true; ussdBox.style.transition = 'none'; };
-        const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease'; saveData(); };
+        // أحداث اللمس والسحب المعدلة لمنع القفز
+        const startDrag = (e) => { 
+            isDragging = true; 
+            ussdBox.style.transition = 'none'; 
+        };
+        
+        const stopDrag = () => { 
+            isDragging = false; 
+            ussdBox.style.transition = 'bottom 0.2s ease-out'; 
+            saveData(); 
+        };
 
         btnCancel.addEventListener('mousedown', startDrag);
         btnCancel.addEventListener('touchstart', startDrag);
@@ -312,19 +318,33 @@
 
         const handleMove = (e) => {
             if (!isDragging) return;
+
+            // منع التحديث الافتراضي تماماً
+            if (e.cancelable) e.preventDefault();
+
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            let phoneRect = document.getElementById('phoneArea').getBoundingClientRect();
+            let phoneRect = phoneArea.getBoundingClientRect();
+            let googleRect = googleBar.getBoundingClientRect();
+            let ussdRect = ussdBox.getBoundingClientRect();
+
+            // حساب المسافة من أسفل الهاتف إلى شريط جوجل (هذا هو السقف النهائي)
+            // المعادلة: (ارتفاع الشاشة) - (مكان شريط جوجل من الأعلى) - (ارتفاع المربع المتحرك)
+            let maxAllowedBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdRect.height + 10;
+            
+            // حساب المكان الجديد بناءً على حركة الإصبع
             let newBottom = phoneRect.bottom - clientY - 30; 
-            if (newBottom > 20 && newBottom < 600) {
-                ussdBox.style.bottom = newBottom + 'px';
-            }
+
+            // تطبيق الحدود بصرامة: لا يقل عن 20 ولا يزيد عن السقف المحسوب
+            if (newBottom < 20) newBottom = 20;
+            if (newBottom > maxAllowedBottom) newBottom = maxAllowedBottom;
+
+            ussdBox.style.bottom = newBottom + 'px';
         };
 
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchmove', handleMove);
+        window.addEventListener('mousemove', handleMove, { passive: false });
+        window.addEventListener('touchmove', handleMove, { passive: false });
 
-        btnSend.onclick = () => { saveData(); alert("تم الحفظ!"); };
-
+        // ميزات أخرى
         function updateBattery() {
             let text = document.getElementById('battery-text').innerText;
             let percent = text.replace(/[^0-9٠-٩]/g, '').replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
@@ -342,5 +362,3 @@
     </script>
 </body>
 </html>
-
-
