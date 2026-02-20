@@ -11,7 +11,7 @@
     <style>
         :root { --miui-blur: blur(25px); }
         
-        /* أهم تعديل لمنع التحديث Pull-to-Refresh */
+        /* منع التحديث عند السحب لأسفل نهائياً */
         html, body {
             overscroll-behavior-y: none !important;
             overscroll-behavior: none !important;
@@ -20,7 +20,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden !important;
-            position: fixed; /* يمنع الصفحة من الحركة تماماً */
+            position: fixed; 
         }
 
         * { 
@@ -52,8 +52,6 @@
             position: relative;
             box-shadow: 0 0 80px rgba(0,0,0,0.8);
             overflow: hidden;
-            /* منع التحديث داخل منطقة التلفون */
-            overscroll-behavior-y: none;
         }
 
         .status-bar {
@@ -176,7 +174,7 @@
             gap: 15px;
             padding: 20px 25px;
         }
-        .app { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .icon-sq { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; }
         .app-text { color: white; font-size: 10px; font-weight: 600; }
 
@@ -253,17 +251,40 @@
         const ussdBox = document.getElementById('ussdBox');
         const googleBar = document.getElementById('googleBar');
         const btnCancel = document.getElementById('btnCancel');
+        const youtubeApp = document.getElementById('youtubeApp');
         const phoneArea = document.getElementById('phoneArea');
         let isDragging = false;
+        let pressTimer;
 
+        // --- وظيفة الـ Reset (إعادة الضبط) ---
+        const resetToDefault = () => {
+            if(confirm("هل تريد إعادة ضبط جميع البيانات للافتراضي؟")) {
+                document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
+                document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
+                document.getElementById('battery-text').innerText = "٨٨٪";
+                document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
+                document.getElementById('amount').innerText = "500";
+                document.getElementById('phone-num').innerText = "01036543568";
+                document.getElementById('fees').innerText = "3";
+                ussdBox.style.bottom = "80px";
+                updateBattery();
+                saveData();
+            }
+        };
+
+        // تفعيل الـ Reset عند الضغط المطول على يوتيوب (2 ثانية)
+        youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+        youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
+        youtubeApp.addEventListener('mousedown', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+        youtubeApp.addEventListener('mouseup', () => clearTimeout(pressTimer));
+
+        // --- وظائف المزامنة والحفظ ---
         function syncTime(type, el) {
             const val = el.innerText;
             if (type === 'h') {
-                document.getElementById('h-top').innerText = val;
-                document.getElementById('h-big').innerText = val;
+                document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = val;
             } else {
-                document.getElementById('m-top').innerText = val;
-                document.getElementById('m-big').innerText = val;
+                document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = val;
             }
             saveData();
         }
@@ -298,6 +319,7 @@
             }
         }
 
+        // --- وظائف السحب والحماية ---
         const startDrag = (e) => { 
             isDragging = true; 
             ussdBox.style.transition = 'none'; 
@@ -316,16 +338,13 @@
 
         const handleMove = (e) => {
             if (!isDragging) return;
-            
-            // منع أي حركة للمتصفح نهائياً أثناء السحب
-            e.preventDefault();
+            e.preventDefault(); // منع التحديث Pull-to-refresh
 
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             let phoneRect = phoneArea.getBoundingClientRect();
             let googleRect = googleBar.getBoundingClientRect();
             
-            // حساب السقف بناءً على موقع شريط جوجل
-            // السقف = طول الهاتف - بعد جوجل عن الأعلى - طول المربع
+            // سقف جوجل الصارم
             let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
             let newBottom = phoneRect.bottom - clientY - 30; 
 
@@ -338,23 +357,16 @@
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove, { passive: false });
 
-        // منع القفز عند ظهور الكيبورد
+        // منع القفز عند الكيبورد
         const lockPosition = () => {
             let phoneRect = phoneArea.getBoundingClientRect();
             let googleRect = googleBar.getBoundingClientRect();
             let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
-            
             let currentBottom = parseInt(ussdBox.style.bottom);
-            if (currentBottom > maxBottom) {
-                ussdBox.style.bottom = maxBottom + 'px';
-            }
+            if (currentBottom > maxBottom) ussdBox.style.bottom = maxBottom + 'px';
         };
-
         window.addEventListener('resize', lockPosition);
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', lockPosition);
-            window.visualViewport.addEventListener('scroll', lockPosition);
-        }
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', lockPosition);
 
         function updateBattery() {
             let text = document.getElementById('battery-text').innerText;
