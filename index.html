@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>HyperOS UI - Pro Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;700;900&display=swap" rel="stylesheet">
@@ -11,6 +11,13 @@
     <style>
         :root { --miui-blur: blur(25px); }
         
+        html, body {
+            /* منع المتصفح من عمل Refresh نهائياً عند السحب لأسفل */
+            overscroll-behavior-y: contain;
+            height: 100%;
+            overflow: hidden;
+        }
+
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
@@ -29,11 +36,9 @@
             font-family: 'Cairo', sans-serif;
             background: #000;
             margin: 0;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
         .phone {
@@ -129,6 +134,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             z-index: 1000;
             touch-action: none; 
+            transition: bottom 0.1s ease-out; /* حركة ناعمة */
         }
         
         .ussd-body { 
@@ -242,9 +248,8 @@
         const btnCancel = document.getElementById('btnCancel');
         const phoneArea = document.getElementById('phoneArea');
         let isDragging = false;
-        let pressTimer;
+        let lastKnownBottom = 80;
 
-        // دالة المزامنة والبيانات
         function syncTime(type, el) {
             const val = el.innerText;
             if (type === 'h') {
@@ -283,23 +288,11 @@
                 document.getElementById('phone-num').innerText = data.phone;
                 document.getElementById('fees').innerText = data.fees;
                 ussdBox.style.bottom = data.bottomPos || '80px';
+                lastKnownBottom = parseInt(ussdBox.style.bottom);
                 updateBattery();
             }
         }
 
-        const resetToDefault = () => {
-            document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
-            document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
-            document.getElementById('battery-text').innerText = "٨٨٪";
-            document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
-            document.getElementById('amount').innerText = "500";
-            document.getElementById('phone-num').innerText = "01036543568";
-            document.getElementById('fees').innerText = "3";
-            updateBattery();
-            saveData();
-        };
-
-        // أحداث اللمس والسحب المعدلة لمنع القفز
         const startDrag = (e) => { 
             isDragging = true; 
             ussdBox.style.transition = 'none'; 
@@ -307,44 +300,52 @@
         
         const stopDrag = () => { 
             isDragging = false; 
-            ussdBox.style.transition = 'bottom 0.2s ease-out'; 
+            ussdBox.style.transition = 'bottom 0.1s ease-out'; 
+            lastKnownBottom = parseInt(ussdBox.style.bottom);
             saveData(); 
         };
 
         btnCancel.addEventListener('mousedown', startDrag);
-        btnCancel.addEventListener('touchstart', startDrag);
+        btnCancel.addEventListener('touchstart', startDrag, {passive: false});
         window.addEventListener('mouseup', stopDrag);
         window.addEventListener('touchend', stopDrag);
 
         const handleMove = (e) => {
             if (!isDragging) return;
-
-            // منع التحديث الافتراضي تماماً
+            
+            // منع أي سلوك افتراضي للمتصفح (مثل Refresh)
             if (e.cancelable) e.preventDefault();
 
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             let phoneRect = phoneArea.getBoundingClientRect();
             let googleRect = googleBar.getBoundingClientRect();
-            let ussdRect = ussdBox.getBoundingClientRect();
-
-            // حساب المسافة من أسفل الهاتف إلى شريط جوجل (هذا هو السقف النهائي)
-            // المعادلة: (ارتفاع الشاشة) - (مكان شريط جوجل من الأعلى) - (ارتفاع المربع المتحرك)
-            let maxAllowedBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdRect.height + 10;
             
-            // حساب المكان الجديد بناءً على حركة الإصبع
+            // حساب السقف الصارم (شريط بحث Google)
+            let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
             let newBottom = phoneRect.bottom - clientY - 30; 
 
-            // تطبيق الحدود بصرامة: لا يقل عن 20 ولا يزيد عن السقف المحسوب
+            // تطبيق الفرامِل
             if (newBottom < 20) newBottom = 20;
-            if (newBottom > maxAllowedBottom) newBottom = maxAllowedBottom;
+            if (newBottom > maxBottom) newBottom = maxBottom;
 
             ussdBox.style.bottom = newBottom + 'px';
         };
 
-        window.addEventListener('mousemove', handleMove, { passive: false });
+        window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove, { passive: false });
 
-        // ميزات أخرى
+        // حل مشكلة الكيبورد: منع المربع من الصعود فوق شريط جوجل عند فتح لوحة المفاتيح
+        window.visualViewport.addEventListener('resize', () => {
+            let phoneRect = phoneArea.getBoundingClientRect();
+            let googleRect = googleBar.getBoundingClientRect();
+            let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
+            
+            let currentBottom = parseInt(ussdBox.style.bottom);
+            if (currentBottom > maxBottom) {
+                ussdBox.style.bottom = maxBottom + 'px';
+            }
+        });
+
         function updateBattery() {
             let text = document.getElementById('battery-text').innerText;
             let percent = text.replace(/[^0-9٠-٩]/g, '').replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
@@ -353,10 +354,7 @@
         }
 
         document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
-        document.getElementById('date-text').addEventListener('input', saveData);
-        document.getElementById('amount').addEventListener('input', saveData);
-        document.getElementById('phone-num').addEventListener('input', saveData);
-        document.getElementById('fees').addEventListener('input', saveData);
+        document.querySelectorAll('.editable').forEach(el => el.addEventListener('input', saveData));
 
         window.onload = loadData;
     </script>
