@@ -256,26 +256,30 @@
         let isDragging = false;
         let pressTimer;
 
-        // --- وظيفة الـ Reset (إعادة الضبط) ---
+        // --- وظيفة الـ Reset الفورية (بدون رسالة تأكيد) ---
         const resetToDefault = () => {
-            if(confirm("هل تريد إعادة ضبط جميع البيانات للافتراضي؟")) {
-                document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
-                document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
-                document.getElementById('battery-text').innerText = "٨٨٪";
-                document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
-                document.getElementById('amount').innerText = "500";
-                document.getElementById('phone-num').innerText = "01036543568";
-                document.getElementById('fees').innerText = "3";
-                ussdBox.style.bottom = "80px";
-                updateBattery();
-                saveData();
-            }
+            document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
+            document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
+            document.getElementById('battery-text').innerText = "٨٨٪";
+            document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
+            document.getElementById('amount').innerText = "500";
+            document.getElementById('phone-num').innerText = "01036543568";
+            document.getElementById('fees').innerText = "3";
+            ussdBox.style.bottom = "80px";
+            updateBattery();
+            saveData();
+            // اهتزاز بسيط لو الموبايل يدعم ده عشان تحس إن الضبط تم
+            if (navigator.vibrate) navigator.vibrate(50);
         };
 
         // تفعيل الـ Reset عند الضغط المطول على يوتيوب (2 ثانية)
-        youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+        youtubeApp.addEventListener('touchstart', (e) => { 
+            pressTimer = setTimeout(resetToDefault, 2000); 
+        });
         youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
-        youtubeApp.addEventListener('mousedown', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+        youtubeApp.addEventListener('mousedown', () => { 
+            pressTimer = setTimeout(resetToDefault, 2000); 
+        });
         youtubeApp.addEventListener('mouseup', () => clearTimeout(pressTimer));
 
         // --- وظائف المزامنة والحفظ ---
@@ -338,7 +342,8 @@
 
         const handleMove = (e) => {
             if (!isDragging) return;
-            e.preventDefault(); // منع التحديث Pull-to-refresh
+            // منع التحديث Pull-to-refresh
+            if (e.cancelable) e.preventDefault();
 
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             let phoneRect = phoneArea.getBoundingClientRect();
