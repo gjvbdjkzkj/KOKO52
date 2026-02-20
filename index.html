@@ -19,7 +19,6 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* السماح بالتفاعل مع العناصر القابلة للتعديل فقط */
         .editable, input, textarea, button, .app { 
             user-select: text !important; 
             touch-action: auto !important; 
@@ -33,7 +32,6 @@
             position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); overflow: hidden;
         }
 
-        /* البار العلوي */
         .status-bar { display: flex; flex-direction: row-reverse; justify-content: space-between; padding: 15px 25px 5px; color: white; font-size: 13px; font-weight: 700; }
         .time-wrapper { display: flex; direction: ltr; align-items: center; }
         .h-part, .m-part { display: inline-block; outline: none; min-width: 5px; }
@@ -47,7 +45,6 @@
 
         .google-bar { width: 90%; margin: 30px auto; background: rgba(255,255,255,0.15); backdrop-filter: blur(15px); border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255, 255, 255, 0.15); z-index: 5; }
 
-        /* صندوق التحويل - السحب */
         .ussd-box { position: absolute; bottom: 80px; left: 15px; right: 15px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1000; }
         .ussd-body { text-align: right; margin: 15px 0; font-size: 16px; color: #000; line-height: 1.6; }
         .black-text { color: inherit; font-weight: inherit; display: inline-block; outline: none; }
@@ -63,13 +60,22 @@
         .icon-sq { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; }
         .app-text { color: white; font-size: 10px; font-weight: 600; }
 
-        /* لوحة تحكم الواتساب */
         #waControl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 4000; display: none; flex-direction: column; }
         .wa-header { background: #008069; color: white; padding: 45px 20px 15px; font-weight: bold; display: flex; align-items: center; gap: 15px; }
         .wa-body { padding: 15px; flex: 1; overflow-y: auto; }
         .wa-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .wa-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: 'Cairo'; margin-top: 5px; outline: none; }
         .wa-save-btn { background: #00a884; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* ستايل ميزة التكرار الجديد */
+        #duplicateAlert { 
+            background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; 
+            margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba;
+        }
+        .clean-btn { 
+            background: #dc3545; color: white; border: none; padding: 5px 10px; 
+            border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo'; font-size: 11px;
+        }
 
         .nav-bar { position: absolute; bottom: 0; width: 100%; height: 60px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; }
         .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
@@ -131,7 +137,13 @@
             <div class="wa-body">
                 <div class="wa-card">
                     <label style="font-size:12px">الأرقام (رقم في كل سطر):</label>
-                    <textarea id="waNumbers" class="wa-input" style="height:100px"></textarea>
+                    <textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
+                    
+                    <div id="duplicateAlert">
+                        <button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button>
+                        <div id="duplicateText">يوجد أرقام مكررة!</div>
+                    </div>
+
                     <div style="display:flex; gap:5px; margin-top:10px">
                         <input type="date" id="dateFrom" class="wa-input" value="2025-12-05">
                         <input type="date" id="dateTo" class="wa-input" value="2026-01-11">
@@ -154,7 +166,6 @@
     </div>
 
     <script>
-        // --- الأساسيات ---
         const ussdBox = document.getElementById('ussdBox');
         const googleBar = document.getElementById('googleBar');
         const btnCancel = document.getElementById('btnCancel');
@@ -165,6 +176,41 @@
         let pressTimer;
 
         const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+
+        // --- ميزة فحص وحذف المكرر الجديدة ---
+        function checkDuplicates() {
+            const area = document.getElementById('waNumbers');
+            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+            const counts = {};
+            const duplicates = [];
+
+            lines.forEach(num => {
+                counts[num] = (counts[num] || 0) + 1;
+            });
+
+            for (let num in counts) {
+                if (counts[num] > 1) duplicates.push(`${num} (مكرر ${counts[num]} مرات)`);
+            }
+
+            const alertBox = document.getElementById('duplicateAlert');
+            const textDisplay = document.getElementById('duplicateText');
+
+            if (duplicates.length > 0) {
+                alertBox.style.display = 'block';
+                textDisplay.innerHTML = `يوجد ${duplicates.length} رقم مكرر:<br>${duplicates.join('<br>')}`;
+            } else {
+                alertBox.style.display = 'none';
+            }
+        }
+
+        function removeDuplicates() {
+            const area = document.getElementById('waNumbers');
+            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+            const uniqueLines = [...new Set(lines)];
+            area.value = uniqueLines.join('\n');
+            checkDuplicates();
+            updateCounter();
+        }
 
         // --- ميزة اليوتيوب (الرجوع للأصل) ---
         const resetToDefault = () => {
@@ -186,7 +232,7 @@
         youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
         youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
 
-        // --- ميزة التمرير (التحريك) ---
+        // --- ميزة التمرير ---
         const startDrag = (e) => { isDragging = true; ussdBox.style.transition = 'none'; };
         const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveData(); };
 
@@ -211,10 +257,17 @@
         window.addEventListener('touchmove', handleMove, { passive: false });
 
         // --- الماكينة والواتساب ---
-        document.getElementById('btnWA').onclick = () => { document.getElementById('waControl').style.display = 'flex'; updateCounter(); };
+        document.getElementById('btnWA').onclick = () => { 
+            document.getElementById('waControl').style.display = 'flex'; 
+            checkDuplicates();
+            updateCounter(); 
+        };
         window.closeWA = () => { document.getElementById('waControl').style.display = 'none'; };
 
-        function updateCounter() { document.getElementById('waCounter').innerText = "الأرقام المتبقية: " + list.length; }
+        function updateCounter() { 
+            const areaLines = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "").length;
+            document.getElementById('waCounter').innerText = "الأرقام المتبقية: " + areaLines; 
+        }
 
         window.saveWA = () => {
             list = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "");
@@ -256,7 +309,6 @@
             saveData();
         };
 
-        // --- مزامنة وجماليات ---
         function syncTime(type, el) {
             const val = el.innerText;
             if (type === 'h') document.querySelectorAll('.h-part').forEach(i => i.innerText = val);
@@ -281,7 +333,8 @@
                 a: document.getElementById('amount').innerText,
                 p: document.getElementById('phone-num').innerText,
                 f: document.getElementById('fees').innerText,
-                pos: ussdBox.style.bottom
+                pos: ussdBox.style.bottom,
+                nums: document.getElementById('waNumbers').value
             };
             localStorage.setItem('hyper_final_v3', JSON.stringify(data));
         }
@@ -298,7 +351,12 @@
                 document.getElementById('phone-num').innerText = d.p;
                 document.getElementById('fees').innerText = d.f;
                 ussdBox.style.bottom = d.pos;
+                if(d.nums) {
+                    document.getElementById('waNumbers').value = d.nums;
+                    list = d.nums.split('\n').filter(x => x.trim() !== "");
+                }
                 updateBattery();
+                updateCounter();
             }
         };
     </script>
