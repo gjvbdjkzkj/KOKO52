@@ -67,7 +67,6 @@
         .wa-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: 'Cairo'; margin-top: 5px; outline: none; }
         .wa-save-btn { background: #00a884; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        /* ستايل ميزة التكرار الجديد */
         #duplicateAlert { 
             background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; 
             margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba;
@@ -78,6 +77,7 @@
         }
 
         .nav-bar { position: absolute; bottom: 0; width: 100%; height: 60px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; }
+        /* تم تعديل الشفافية هنا لتشمل كل الأزرار بما فيها السهم */
         .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
     </style>
 </head>
@@ -161,7 +161,7 @@
         <div class="nav-bar">
             <div class="nav-shape" style="border-radius:3px"></div>
             <div class="nav-shape" style="border-radius:50%"></div>
-            <div class="nav-shape" style="border:none; border-left:2px solid white; border-bottom:2px solid white; transform:rotate(45deg); width:13px; height:13px;"></div>
+            <div class="nav-shape" style="border:none; border-left:2px solid rgba(255,255,255,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transform:rotate(45deg); width:13px; height:13px;"></div>
         </div>
     </div>
 
@@ -177,7 +177,6 @@
 
         const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
 
-        // --- ميزة فحص وحذف المكرر الجديدة ---
         function checkDuplicates() {
             const area = document.getElementById('waNumbers');
             const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
@@ -212,7 +211,6 @@
             updateCounter();
         }
 
-        // --- ميزة اليوتيوب (الرجوع للأصل) ---
         const resetToDefault = () => {
             document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
             document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
@@ -232,7 +230,6 @@
         youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
         youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
 
-        // --- ميزة التمرير ---
         const startDrag = (e) => { isDragging = true; ussdBox.style.transition = 'none'; };
         const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveData(); };
 
@@ -256,7 +253,6 @@
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove, { passive: false });
 
-        // --- الماكينة والواتساب ---
         document.getElementById('btnWA').onclick = () => { 
             document.getElementById('waControl').style.display = 'flex'; 
             checkDuplicates();
