@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HyperOS UI - Ultimate Edition</title>
+    <title>HyperOS UI - Final Fixed</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     
     <style>
@@ -24,30 +25,138 @@
             touch-action: auto !important; 
         }
 
-        body { font-family: 'Cairo', sans-serif; background: #000; display: flex; align-items: center; justify-content: center; }
+        body { font-family: 'Tajawal', sans-serif; background: #000; display: flex; align-items: center; justify-content: center; }
 
         .phone {
             width: 400px; height: 100vh;
             background: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000') center/cover;
             position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); overflow: hidden;
+            transition: background-image 0.4s ease;
         }
 
-        .status-bar { display: flex; flex-direction: row-reverse; justify-content: space-between; padding: 15px 25px 5px; color: white; font-size: 13px; font-weight: 700; }
+        /* شريط الحالة */
+        .status-bar {
+            direction: ltr !important;
+            display: flex;
+            justify-content: space-between !important;
+            align-items: center;
+            padding: 10px 15px !important;
+            color: white;
+            font-weight: 500;
+        }
+
+        .time-side {
+            order: 2;
+            direction: rtl;
+            font-size: 16px;
+            font-weight: 500;
+        }
         .time-wrapper { display: flex; direction: ltr; align-items: center; }
         .h-part, .m-part { display: inline-block; outline: none; min-width: 5px; }
-        
-        .battery-side { display: flex; align-items: center; gap: 6px; }
-        .battery-box { width: 22px; height: 10px; border: 1px solid rgba(255,255,255,0.6); border-radius: 2px; padding: 1px; display: flex; align-items: center; }
-        .battery-fill { height: 100%; background: white; width: 88%; transition: width 0.3s ease; }
 
-        .clock-container { text-align: center; color: white; margin-top: 40px; display: flex; flex-direction: column; align-items: center; }
-        .clock-container h1 { font-size: 75px; font-weight: 200; margin: 0; line-height: 1; }
+        .miui-left {
+            order: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
 
+        /* البطارية */
+        .battery-side {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .battery-box {
+            width: 22px;
+            height: 10px;
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 2px;
+            padding: 1px;
+            display: flex;
+            align-items: center;
+        }
+        .battery-fill {
+            height: 100%;
+            background: white;
+            width: 88%;
+            transition: width 0.3s ease;
+        }
+        #battery-text {
+            font-size: 10px;
+            font-weight: 700;
+            outline: none;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* مجموعة الشبكة */
+        .network-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .four-g {
+            font-size: 9px;
+            font-weight: 600;
+            opacity: 0.9;
+            letter-spacing: -0.5px;
+        }
+        .fa-signal {
+            font-size: 11px;
+        }
+        .kbs {
+            font-size: 10px;
+            margin-left: 2px;
+        }
+
+        /* التاريخ */
+        .clock-container {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #big-clock {
+            display: none;
+        }
+        #date-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            color: white;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* أسماء الأيقونات */
+        .app-text {
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* رسائل التحويل */
+        .ussd-body {
+            font-family: 'Cairo', sans-serif;
+            text-align: right;
+            margin: 15px 0;
+            font-size: 16px;
+            color: #000;
+            line-height: 1.6;
+        }
+        .ussd-body .black-text {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* باقي الأنماط */
         .google-bar { width: 90%; margin: 30px auto; background: rgba(255,255,255,0.15); backdrop-filter: blur(15px); border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255, 255, 255, 0.15); z-index: 5; }
 
         .ussd-box { position: absolute; bottom: 80px; left: 15px; right: 15px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 1000; }
-        .ussd-body { text-align: right; margin: 15px 0; font-size: 16px; color: #000; line-height: 1.6; }
-        .black-text { color: inherit; font-weight: inherit; display: inline-block; outline: none; }
         .ussd-input { width: 100%; border: none; border-bottom: 2px solid #1a73e8; padding: 10px; text-align: right; outline: none; background: #f8f9fa; margin-bottom: 20px; }
         
         .ussd-actions { display: flex; gap: 10px; }
@@ -56,305 +165,361 @@
         .u-send { background: #1a73e8; color: #fff; }
 
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px 25px; }
-        .app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; z-index: 10; }
-        .icon-sq { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; }
-        .app-text { color: white; font-size: 10px; font-weight: 600; }
+        .app { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; z-index: 10; }
+        
+        /* ستايل الأيقونات الحقيقية (تم التعديل هنا لإصلاح المشكلة) */
+        .real-icon {
+            width: 55px; 
+            height: 55px; 
+            object-fit: contain;
+            /* هذه الأسطر مهمة جداً لإصلاح النقر */
+            pointer-events: none; 
+            user-select: none;
+            -webkit-user-drag: none;
+        }
 
         #waControl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 4000; display: none; flex-direction: column; }
         .wa-header { background: #008069; color: white; padding: 45px 20px 15px; font-weight: bold; display: flex; align-items: center; gap: 15px; }
         .wa-body { padding: 15px; flex: 1; overflow-y: auto; }
         .wa-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .wa-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: 'Cairo'; margin-top: 5px; outline: none; }
+        .wa-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: 'Cairo', sans-serif; margin-top: 5px; outline: none; }
         .wa-save-btn { background: #00a884; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        #duplicateAlert { 
-            background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; 
-            margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba;
-        }
-        .clean-btn { 
-            background: #dc3545; color: white; border: none; padding: 5px 10px; 
-            border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo'; font-size: 11px;
-        }
+        #duplicateAlert { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba; }
+        .clean-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 11px; }
 
         .nav-bar { position: absolute; bottom: 0; width: 100%; height: 60px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; }
-        /* تم تعديل الشفافية هنا لتشمل كل الأزرار بما فيها السهم */
         .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
 
-    <div class="phone" id="phoneArea">
-        <div class="status-bar">
-            <div class="time-side">
-                <div class="time-wrapper">
-                    <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
-                    <span style="user-select: none; margin: 0 1px;">:</span>
-                    <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
-                </div>
+<div class="phone" id="phoneArea">
+    <div class="status-bar">
+        <div class="time-side">
+            <div class="time-wrapper">
+                <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
+                <span style="user-select: none; margin: 0 1px;">:</span>
+                <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
             </div>
+        </div>
+        <div class="miui-left">
             <div class="battery-side">
-                <div class="battery-box"><div class="battery-fill" id="battery-level"></div></div>
+                <div class="battery-box">
+                    <div class="battery-fill" id="battery-level" style="width: 88%"></div>
+                </div>
                 <span class="editable" contenteditable="true" id="battery-text">٨٨٪</span>
-                <i class="fas fa-signal" style="font-size: 10px;"></i>
-                <i class="fas fa-wifi" style="font-size: 10px;"></i>
             </div>
-        </div>
-
-        <div class="clock-container">
-            <h1>
-                <div class="time-wrapper">
-                    <span class="editable h-part" contenteditable="true" id="h-big" oninput="syncTime('h', this)">١١</span>
-                    <span style="user-select: none;">:</span>
-                    <span class="editable m-part" contenteditable="true" id="m-big" oninput="syncTime('m', this)">٣٣</span>
-                </div>
-            </h1>
-            <p class="editable" contenteditable="true" id="date-text">الأربعاء، ٢٤ مايو</p>
-        </div>
-
-        <div class="google-bar" id="googleBar"><span style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
-
-        <div class="grid">
-            <div class="app" id="btnWA"><div class="icon-sq" style="background:#25D366"><i class="fab fa-whatsapp"></i></div><span class="app-text">واتساب</span></div>
-            <div class="app" id="btnFB"><div class="icon-sq" style="background:#1877F2"><i class="fab fa-facebook"></i></div><span class="app-text">فيسبوك</span></div>
-            <div class="app"><div class="icon-sq" style="background:#0088cc"><i class="fab fa-telegram"></i></div><span class="app-text">تيليجرام</span></div>
-            <div class="app" id="youtubeApp"><div class="icon-sq" style="background:#FF0000"><i class="fab fa-youtube"></i></div><span class="app-text">يوتيوب</span></div>
-        </div>
-
-        <div class="ussd-box" id="ussdBox">
-            <div class="ussd-body">
-                تم تحويل <span class="black-text editable" contenteditable="true" id="amount">500</span> جنيه لرقم <span class="black-text editable" contenteditable="true" id="phone-num">01036543568</span>
-                <br> مصاريف الخدمة <span class="black-text editable" contenteditable="true" id="fees">3</span> جنيه . اطلب #9* و اشحن
+            <div class="network-group">
+                <span class="four-g">4G</span>
+                <i class="fas fa-signal"></i>
+                <span class="kbs">KB/S</span>
             </div>
-            <input type="text" class="ussd-input">
-            <div class="ussd-actions">
-                <button class="u-btn u-cancel" id="btnCancel">Cancel</button>
-                <button class="u-btn u-send">Send</button>
-            </div>
-        </div>
-
-        <div id="waControl">
-            <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات</div>
-            <div class="wa-body">
-                <div class="wa-card">
-                    <label style="font-size:12px">الأرقام (رقم في كل سطر):</label>
-                    <textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
-                    
-                    <div id="duplicateAlert">
-                        <button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button>
-                        <div id="duplicateText">يوجد أرقام مكررة!</div>
-                    </div>
-
-                    <div style="display:flex; gap:5px; margin-top:10px">
-                        <input type="date" id="dateFrom" class="wa-input" value="2025-12-05">
-                        <input type="date" id="dateTo" class="wa-input" value="2026-01-11">
-                    </div>
-                    <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3">
-                    <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold">
-                        <input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)
-                    </label>
-                    <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
-                    <div id="waCounter" style="text-align:center; margin-top:10px; font-weight:bold; color:#008069">الأرقام المتبقية: 0</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-bar">
-            <div class="nav-shape" style="border-radius:3px"></div>
-            <div class="nav-shape" style="border-radius:50%"></div>
-            <div class="nav-shape" style="border:none; border-left:2px solid rgba(255,255,255,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transform:rotate(45deg); width:13px; height:13px;"></div>
         </div>
     </div>
 
-    <script>
-        const ussdBox = document.getElementById('ussdBox');
-        const googleBar = document.getElementById('googleBar');
-        const btnCancel = document.getElementById('btnCancel');
-        const youtubeApp = document.getElementById('youtubeApp');
-        const phoneArea = document.getElementById('phoneArea');
-        let list = [];
-        let isDragging = false;
-        let pressTimer;
+    <div class="clock-container">
+        <h1 id="big-clock">
+            <div class="time-wrapper">
+                <span class="editable h-part" contenteditable="true" id="h-big" oninput="syncTime('h', this)">١١</span>
+                <span style="user-select: none;">:</span>
+                <span class="editable m-part" contenteditable="true" id="m-big" oninput="syncTime('m', this)">٣٣</span>
+            </div>
+        </h1>
+        <div style="height:75px;"></div>
+        <p class="editable" contenteditable="true" id="date-text">الأربعاء، ٢٤ مايو</p>
+    </div>
 
-        const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+    <div class="google-bar" id="googleBar"><span style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
 
-        function checkDuplicates() {
-            const area = document.getElementById('waNumbers');
-            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
-            const counts = {};
-            const duplicates = [];
+    <div class="grid">
+        <div class="app" id="btnWA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="real-icon" alt="WhatsApp">
+            <span class="app-text">واتساب</span>
+        </div>
+        <div class="app" id="btnFB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" class="real-icon" alt="Facebook">
+            <span class="app-text">فيسبوك</span>
+        </div>
+        <!-- زر تيليجرام: تم التأكد من المعرف -->
+        <div class="app" id="telegramBtn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="real-icon" alt="Telegram">
+            <span class="app-text">تيليجرام</span>
+        </div>
+        <div class="app" id="youtubeApp">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="real-icon" alt="YouTube">
+            <span class="app-text">يوتيوب</span>
+        </div>
+    </div>
 
-            lines.forEach(num => {
-                counts[num] = (counts[num] || 0) + 1;
-            });
+    <div class="ussd-box" id="ussdBox">
+        <div class="ussd-body">
+            تم تحويل <span class="black-text editable" contenteditable="true" id="amount">500</span> جنيه لرقم <span class="black-text editable" contenteditable="true" id="phone-num">01036543568</span>
+            <br> مصاريف الخدمة <span class="black-text editable" contenteditable="true" id="fees">3</span> جنيه . اطلب #9* و اشحن
+        </div>
+        <input type="text" class="ussd-input">
+        <div class="ussd-actions">
+            <button class="u-btn u-cancel" id="btnCancel">Cancel</button>
+            <button class="u-btn u-send">Send</button>
+        </div>
+    </div>
 
-            for (let num in counts) {
-                if (counts[num] > 1) duplicates.push(`${num} (مكرر ${counts[num]} مرات)`);
+    <div id="waControl">
+        <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات</div>
+        <div class="wa-body">
+            <div class="wa-card">
+                <label style="font-size:12px">الأرقام (رقم في كل سطر):</label>
+                <textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
+                
+                <div id="duplicateAlert">
+                    <button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button>
+                    <div id="duplicateText">يوجد أرقام مكررة!</div>
+                </div>
+
+                <div style="display:flex; gap:5px; margin-top:10px">
+                    <input type="date" id="dateFrom" class="wa-input" value="2025-12-05">
+                    <input type="date" id="dateTo" class="wa-input" value="2026-01-11">
+                </div>
+                <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3">
+                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold">
+                    <input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)
+                </label>
+                <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
+                <div id="waCounter" style="text-align:center; margin-top:10px; font-weight:bold; color:#008069">الأرقام المتبقية: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-shape" style="border-radius:3px"></div>
+        <div class="nav-shape" style="border-radius:50%"></div>
+        <div class="nav-shape" style="border:none; border-left:2px solid rgba(255,255,255,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transform:rotate(45deg); width:13px; height:13px;"></div>
+    </div>
+</div>
+
+<script>
+    const ussdBox = document.getElementById('ussdBox');
+    const googleBar = document.getElementById('googleBar');
+    const btnCancel = document.getElementById('btnCancel');
+    const youtubeApp = document.getElementById('youtubeApp');
+    const phoneArea = document.getElementById('phoneArea');
+    let list =[];
+    let isDragging = false;
+    let pressTimer;
+
+    const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+    const toEn = (str) => str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+
+    function removeZeroFromClock() {
+        document.querySelectorAll(".h-part").forEach(el => {
+            let val = el.innerText.trim();
+            let num = toEn(val);
+            if (num.startsWith("0") && num.length > 1) {
+                num = parseInt(num, 10).toString();
             }
+            el.innerText = toAr(num);
+        });
+    }
 
-            const alertBox = document.getElementById('duplicateAlert');
-            const textDisplay = document.getElementById('duplicateText');
+    function updateBattery() {
+        let textEl = document.getElementById('battery-text');
+        let text = textEl.innerText;
+        let percent = toEn(text.replace(/[^0-9٠-٩]/g, ''));
+        let val = parseInt(percent) || 0;
+        document.getElementById('battery-level').style.width = Math.min(val, 100) + '%';
+    }
 
-            if (duplicates.length > 0) {
-                alertBox.style.display = 'block';
-                textDisplay.innerHTML = `يوجد ${duplicates.length} رقم مكرر:<br>${duplicates.join('<br>')}`;
-            } else {
-                alertBox.style.display = 'none';
-            }
+    function syncTime(type, el) {
+        const val = el.innerText;
+        if (type === 'h') document.querySelectorAll('.h-part').forEach(i => i.innerText = val);
+        else document.querySelectorAll('.m-part').forEach(i => i.innerText = val);
+        removeZeroFromClock();
+        saveData();
+    }
+
+    function checkDuplicates() {
+        const area = document.getElementById('waNumbers');
+        const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+        const counts = {};
+        const duplicates =[];
+
+        lines.forEach(num => { counts[num] = (counts[num] || 0) + 1; });
+        for (let num in counts) {
+            if (counts[num] > 1) duplicates.push(`${num} (مكرر ${counts[num]} مرات)`);
         }
 
-        function removeDuplicates() {
-            const area = document.getElementById('waNumbers');
-            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
-            const uniqueLines = [...new Set(lines)];
-            area.value = uniqueLines.join('\n');
-            checkDuplicates();
-            updateCounter();
-        }
+        const alertBox = document.getElementById('duplicateAlert');
+        const textDisplay = document.getElementById('duplicateText');
 
-        const resetToDefault = () => {
-            document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
-            document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
-            document.getElementById('battery-text').innerText = "٨٨٪";
-            document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
-            document.getElementById('amount').innerText = "500";
-            document.getElementById('phone-num').innerText = "01036543568";
-            document.getElementById('fees').innerText = "3";
-            ussdBox.style.bottom = "80px";
+        if (duplicates.length > 0) {
+            alertBox.style.display = 'block';
+            textDisplay.innerHTML = `يوجد ${duplicates.length} رقم مكرر:<br>${duplicates.join('<br>')}`;
+        } else {
+            alertBox.style.display = 'none';
+        }
+    }
+
+    function removeDuplicates() {
+        const area = document.getElementById('waNumbers');
+        const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+        const uniqueLines = [...new Set(lines)];
+        area.value = uniqueLines.join('\n');
+        checkDuplicates();
+        updateCounter();
+    }
+
+    function updateCounter() { 
+        const areaLines = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "").length;
+        document.getElementById('waCounter').innerText = "الأرقام المتبقية: " + areaLines; 
+    }
+
+    window.saveWA = () => {
+        list = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "");
+        updateCounter();
+        closeWA();
+    };
+
+    window.closeWA = () => { document.getElementById('waControl').style.display = 'none'; };
+
+    const resetToDefault = () => {
+        document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
+        document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
+        document.getElementById('battery-text').innerText = "٨٨٪";
+        document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
+        document.getElementById('amount').innerText = "500";
+        document.getElementById('phone-num').innerText = "01036543568";
+        document.getElementById('fees').innerText = "3";
+        ussdBox.style.bottom = "80px";
+        phoneArea.style.backgroundImage = "url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000')";
+        removeZeroFromClock();
+        updateBattery();
+        saveData();
+        if (navigator.vibrate) navigator.vibrate(100);
+    };
+
+    youtubeApp.addEventListener('mousedown', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+    youtubeApp.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+    youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+    const startDrag = (e) => { isDragging = true; ussdBox.style.transition = 'none'; };
+    const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveData(); };
+
+    btnCancel.addEventListener('mousedown', startDrag);
+    btnCancel.addEventListener('touchstart', startDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchend', stopDrag);
+
+    const handleMove = (e) => {
+        if (!isDragging) return;
+        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        let phoneRect = phoneArea.getBoundingClientRect();
+        let googleRect = googleBar.getBoundingClientRect();
+        let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
+        let newBottom = phoneRect.bottom - clientY - 30; 
+        if (newBottom < 20) newBottom = 20;
+        if (newBottom > maxBottom) newBottom = maxBottom;
+        ussdBox.style.bottom = newBottom + 'px';
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+
+    document.getElementById('btnWA').onclick = () => { 
+        document.getElementById('waControl').style.display = 'flex'; 
+        checkDuplicates();
+        updateCounter(); 
+    };
+
+    document.getElementById('btnFB').onclick = () => {
+        if (list.length === 0) return alert("خلصت الأرقام!");
+        const phone = list.shift();
+        document.getElementById('waNumbers').value = list.join('\n');
+        updateCounter();
+
+        const fees = document.getElementById('fixedFees').value;
+        const amount = Math.floor(Math.random() * (576 - 500 + 1)) + 500;
+        const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5;
+        const d1 = new Date(document.getElementById('dateFrom').value);
+        const d2 = new Date(document.getElementById('dateTo').value);
+        const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime()));
+
+        document.getElementById('phone-num').innerText = phone;
+        document.getElementById('amount').innerText = amount;
+        document.getElementById('fees').innerText = fees;
+        document.getElementById('battery-text').innerText = toAr(batt) + "٪";
+        updateBattery();
+
+        let h = randD.getHours() % 12 || 12;
+        let m = randD.getMinutes();
+        let hS = h < 10 ? "0"+h : h.toString();
+        let mS = m < 10 ? "0"+m : m.toString();
+        document.querySelectorAll('.h-part').forEach(i => i.innerText = toAr(hS));
+        document.querySelectorAll('.m-part').forEach(i => i.innerText = toAr(mS));
+
+        if (document.getElementById('dateType').checked) {
+            document.getElementById('date-text').innerText = randD.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
+        } else {
+            document.getElementById('date-text').innerText = randD.getDate() + "/" + (randD.getMonth()+1) + "/" + randD.getFullYear();
+        }
+        removeZeroFromClock();
+        saveData();
+    };
+
+    // ===== تم إصلاح زر تغيير الخلفية (تيليجرام) =====
+    const telegramBtn = document.getElementById('telegramBtn');
+    if (telegramBtn) {
+        telegramBtn.onclick = function() {
+            if (navigator.vibrate) navigator.vibrate(50); // هزة للتأكيد
+            const randomId = Math.floor(Math.random() * 1084) + 1;
+            phoneArea.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://picsum.photos/id/${randomId}/400/800')`;
+        };
+    }
+
+    function saveData() {
+        const data = {
+            h: document.getElementById('h-top').innerText,
+            m: document.getElementById('m-top').innerText,
+            b: document.getElementById('battery-text').innerText,
+            d: document.getElementById('date-text').innerText,
+            a: document.getElementById('amount').innerText,
+            p: document.getElementById('phone-num').innerText,
+            f: document.getElementById('fees').innerText,
+            pos: ussdBox.style.bottom,
+            nums: document.getElementById('waNumbers').value
+        };
+        localStorage.setItem('hyper_final_v3', JSON.stringify(data));
+    }
+
+    window.onload = () => {
+        const s = localStorage.getItem('hyper_final_v3');
+        if (s) {
+            const d = JSON.parse(s);
+            document.querySelectorAll('.h-part').forEach(i => i.innerText = d.h);
+            document.querySelectorAll('.m-part').forEach(i => i.innerText = d.m);
+            document.getElementById('battery-text').innerText = d.b;
+            document.getElementById('date-text').innerText = d.d;
+            document.getElementById('amount').innerText = d.a;
+            document.getElementById('phone-num').innerText = d.p;
+            document.getElementById('fees').innerText = d.f;
+            ussdBox.style.bottom = d.pos;
+            if(d.nums) {
+                document.getElementById('waNumbers').value = d.nums;
+                list = d.nums.split('\n').filter(x => x.trim() !== "");
+            }
+            removeZeroFromClock();
             updateBattery();
-            saveData();
-            if (navigator.vibrate) navigator.vibrate(100);
-        };
-
-        youtubeApp.addEventListener('mousedown', () => { pressTimer = setTimeout(resetToDefault, 2000); });
-        youtubeApp.addEventListener('mouseup', () => clearTimeout(pressTimer));
-        youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
-        youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
-
-        const startDrag = (e) => { isDragging = true; ussdBox.style.transition = 'none'; };
-        const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveData(); };
-
-        btnCancel.addEventListener('mousedown', startDrag);
-        btnCancel.addEventListener('touchstart', startDrag);
-        window.addEventListener('mouseup', stopDrag);
-        window.addEventListener('touchend', stopDrag);
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            let phoneRect = phoneArea.getBoundingClientRect();
-            let googleRect = googleBar.getBoundingClientRect();
-            let maxBottom = phoneRect.height - (googleRect.top - phoneRect.top) - ussdBox.offsetHeight + 10;
-            let newBottom = phoneRect.bottom - clientY - 30; 
-            if (newBottom < 20) newBottom = 20;
-            if (newBottom > maxBottom) newBottom = maxBottom;
-            ussdBox.style.bottom = newBottom + 'px';
-        };
-
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchmove', handleMove, { passive: false });
-
-        document.getElementById('btnWA').onclick = () => { 
-            document.getElementById('waControl').style.display = 'flex'; 
-            checkDuplicates();
-            updateCounter(); 
-        };
-        window.closeWA = () => { document.getElementById('waControl').style.display = 'none'; };
-
-        function updateCounter() { 
-            const areaLines = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "").length;
-            document.getElementById('waCounter').innerText = "الأرقام المتبقية: " + areaLines; 
-        }
-
-        window.saveWA = () => {
-            list = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "");
             updateCounter();
-            closeWA();
-        };
-
-        document.getElementById('btnFB').onclick = () => {
-            if (list.length === 0) return alert("خلصت الأرقام!");
-            const phone = list.shift();
-            document.getElementById('waNumbers').value = list.join('\n');
-            updateCounter();
-
-            const fees = document.getElementById('fixedFees').value;
-            const amount = Math.floor(Math.random() * (576 - 500 + 1)) + 500;
-            const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5;
-            const d1 = new Date(document.getElementById('dateFrom').value);
-            const d2 = new Date(document.getElementById('dateTo').value);
-            const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime()));
-
-            document.getElementById('phone-num').innerText = phone;
-            document.getElementById('amount').innerText = amount;
-            document.getElementById('fees').innerText = fees;
-            document.getElementById('battery-text').innerText = toAr(batt) + "٪";
+        } else {
+            removeZeroFromClock();
             updateBattery();
-
-            let h = randD.getHours() % 12 || 12;
-            let m = randD.getMinutes();
-            let hS = h < 10 ? "0"+h : h.toString();
-            let mS = m < 10 ? "0"+m : m.toString();
-            document.querySelectorAll('.h-part').forEach(i => i.innerText = toAr(hS));
-            document.querySelectorAll('.m-part').forEach(i => i.innerText = toAr(mS));
-
-            if (document.getElementById('dateType').checked) {
-                document.getElementById('date-text').innerText = randD.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
-            } else {
-                document.getElementById('date-text').innerText = randD.getDate() + "/" + (randD.getMonth()+1) + "/" + randD.getFullYear();
-            }
-            saveData();
-        };
-
-        function syncTime(type, el) {
-            const val = el.innerText;
-            if (type === 'h') document.querySelectorAll('.h-part').forEach(i => i.innerText = val);
-            else document.querySelectorAll('.m-part').forEach(i => i.innerText = val);
-            saveData();
         }
+    };
 
-        function updateBattery() {
-            let text = document.getElementById('battery-text').innerText;
-            let percent = text.replace(/[^0-9٠-٩]/g, '').replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-            let val = parseInt(percent) || 0;
-            document.getElementById('battery-level').style.width = Math.min(val, 100) + '%';
-        }
-        document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
-
-        function saveData() {
-            const data = {
-                h: document.getElementById('h-top').innerText,
-                m: document.getElementById('m-top').innerText,
-                b: document.getElementById('battery-text').innerText,
-                d: document.getElementById('date-text').innerText,
-                a: document.getElementById('amount').innerText,
-                p: document.getElementById('phone-num').innerText,
-                f: document.getElementById('fees').innerText,
-                pos: ussdBox.style.bottom,
-                nums: document.getElementById('waNumbers').value
-            };
-            localStorage.setItem('hyper_final_v3', JSON.stringify(data));
-        }
-
-        window.onload = () => {
-            const s = localStorage.getItem('hyper_final_v3');
-            if (s) {
-                const d = JSON.parse(s);
-                document.querySelectorAll('.h-part').forEach(i => i.innerText = d.h);
-                document.querySelectorAll('.m-part').forEach(i => i.innerText = d.m);
-                document.getElementById('battery-text').innerText = d.b;
-                document.getElementById('date-text').innerText = d.d;
-                document.getElementById('amount').innerText = d.a;
-                document.getElementById('phone-num').innerText = d.p;
-                document.getElementById('fees').innerText = d.f;
-                ussdBox.style.bottom = d.pos;
-                if(d.nums) {
-                    document.getElementById('waNumbers').value = d.nums;
-                    list = d.nums.split('\n').filter(x => x.trim() !== "");
-                }
-                updateBattery();
-                updateCounter();
-            }
-        };
-    </script>
+    document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
+    document.querySelectorAll('.h-part, .m-part').forEach(el => {
+        el.addEventListener('input', removeZeroFromClock);
+    });
+</script>
 </body>
 </html>
