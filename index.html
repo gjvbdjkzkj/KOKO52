@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>شاومي برو - متجاوب بالكامل</title>
+    <title>شاومي برو - بدون تحديث تلقائي وحفظ دائم</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* منع السحب لتحديث الصفحة (pull-to-refresh) */
+        body {
+            overscroll-behavior-y: contain;
+            background-color: #1a1a1a; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+        }
         @font-face {
             font-family: 'Microsoft Uighur';
             src: local('Microsoft Uighur'), local('Microsoft Uighur Regular'), local('Tahoma'), local('Noto Naskh Arabic');
@@ -26,21 +38,10 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--system-font); outline: none; }
 
-        body { 
-            background-color: #1a1a1a; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            overflow: hidden; 
-            margin: 0;
-            padding: 0;
-        }
-
         .phone-frame {
             width: var(--phone-width);
             height: var(--phone-height);
-            max-width: 360px; /* الحجم الافتراضي للشاشات الكبيرة */
+            max-width: 360px; 
             background: var(--bg-ui) center/cover;
             position: relative;
             overflow: hidden;
@@ -49,12 +50,10 @@
             transition: background-image 0.8s ease-in-out;
             padding-bottom: 80px; 
         }
-
-        /* على الأجهزة التي يقل عرضها عن 600px (معظم الهواتف) نجعل الإطار يملأ الشاشة بالكامل */
         @media (max-width: 600px) {
             .phone-frame {
                 max-width: 100%;
-                box-shadow: none; /* إزالة الظل على الهاتف ليملأ الشاشة بدون حدود */
+                box-shadow: none;
             }
         }
 
@@ -66,7 +65,7 @@
         }
         .phone-content::-webkit-scrollbar { display: none; }
 
-        /* --- شريط الحالة (مصغر) --- */
+        /* شريط الحالة */
         .status-bar {
             height: 40px; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
@@ -101,7 +100,7 @@
         .battery-level { position: absolute; left: 1px; top: 1px; bottom: 1px; background: #fff; border-radius: 1.5px; z-index: 1; }
         .battery-percentage { position: relative; z-index: 2; font-size: 7px; font-weight: 900; color: #000; line-height: 1; transform: scale(0.9); }
 
-        /* --- ودجت جوجل (مصغر) --- */
+        /* ودجت جوجل */
         .google-widget {
             margin: 15px 15px 8px 15px;
             background: rgba(255, 255, 255, 0.95);
@@ -116,7 +115,7 @@
         .google-search-text { flex: 1; color: #70757a; font-size: 13px; text-align: right; }
         .google-icons { display: flex; gap: 10px; color: #5f6368; font-size: 16px; }
 
-        /* --- ودجت الساعة والطقس (مصغر) --- */
+        /* ودجت الساعة والطقس */
         .main-widget-row {
             display: flex;
             justify-content: space-between;
@@ -153,7 +152,7 @@
             line-height: 1.1;
         }
 
-        /* --- التطبيقات (مصغر) --- */
+        /* التطبيقات */
         .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 8px 15px; margin-top: 5px; }
         .app-item { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; cursor: pointer; }
         .icon-box { 
@@ -176,7 +175,7 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        /* --- المربع المنبثق (USSD) --- */
+        /* المربع المنبثق (ثابت بدون سحب) */
         .overlay { 
             position: absolute; 
             bottom: 0;          
@@ -212,14 +211,7 @@
         .btn-send { background: #0078d4; color: white; }
         .btn-cancel { background: #f0f0f0; color: #333; }
 
-        /* --- لوحة تحكم الأرقام المخفية --- */
-        #bulkSettings { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; background: white; border-radius: 25px; padding: 20px; z-index: 4000; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        #bulkSettings h3 { margin-bottom: 15px; font-size: 16px; color: #333; text-align: center; }
-        #bulkSettings textarea { width: 100%; height: 100px; border: 1px solid #ddd; border-radius: 10px; padding: 8px; resize: none; margin-bottom: 10px; font-size: 12px; }
-        #bulkSettings input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; font-size: 14px; }
-        .settings-trigger { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; z-index: 3000; cursor: pointer; opacity: 0; }
-
-        /* --- لوحة إعدادات واتساب المطورة --- */
+        /* لوحة إعدادات واتساب المطورة */
         #waControl {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 5000; 
             display: none; flex-direction: column; overflow-y: auto;
@@ -233,19 +225,16 @@
         .clean-btn { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 10px; }
         #waCounter { text-align:center; margin-top:10px; font-weight:bold; color:#008069; font-size: 13px; }
 
-        /* --- شريط التنقل السفلي (مصغر) --- */
+        /* شريط التنقل السفلي (بدون سحب) */
         .nav-bar-container { position: absolute; bottom: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 2000; background: linear-gradient(to top, rgba(0,0,0,0.3), transparent); padding-top: 8px; }
         .nav-bar { width: 100%; display: flex; justify-content: space-around; color: white; opacity: 0.9; font-size: 16px; align-items: center; padding: 0 25px; }
         .nav-bar i { cursor: pointer; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; }
-        .nav-drag-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 10px; margin-bottom: 6px; cursor: grab; opacity: 0; transition: opacity 0.5s; }
+        /* تم إزالة مقبض السحب .nav-drag-handle */
     </style>
 </head>
 <body>
 
 <div class="phone-frame" id="phoneFrame">
-    <!-- الزاوية العلوية اليمنى لفتح الإعدادات القديمة -->
-    <div class="settings-trigger" onclick="toggleSettings()"></div>
-
     <!-- شريط الحالة -->
     <div class="status-bar">
         <div class="status-left"><div class="editable-time" id="clockTime" contenteditable="true">١٢:٥٩</div></div>
@@ -294,14 +283,6 @@
         </div>
     </div>
 
-    <!-- لوحة الإعدادات القديمة (bulkSettings) -->
-    <div id="bulkSettings">
-        <h3>تجهيز قائمة الإرسال</h3>
-        <textarea id="phoneList" placeholder="اكتب الأرقام هنا.. (رقم في كل سطر)"></textarea>
-        <input type="number" id="fixedAmount" placeholder="أدخل المبلغ الثابت">
-        <button class="btn btn-send" onclick="saveAndClose()">حفظ القائمة</button>
-    </div>
-
     <!-- لوحة إعدادات واتساب المطورة -->
     <div id="waControl">
         <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات المتطورة</div>
@@ -333,7 +314,7 @@
         </div>
     </div>
 
-    <!-- صندوق USSD المنبثق -->
+    <!-- صندوق USSD المنبثق (بدون إمكانية السحب) -->
     <div class="overlay" id="overlay">
         <div class="ussd-container" id="ussdContainer">
             <div class="ussd-box">
@@ -353,9 +334,8 @@
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي -->
+    <!-- شريط التنقل السفلي (بدون مقبض السحب) -->
     <div class="nav-bar-container" id="navContainer">
-        <div class="nav-drag-handle" id="navDragBtn"></div>
         <div class="nav-bar">
             <i class="fas fa-chevron-right"></i> 
             <i class="far fa-circle"></i>       
@@ -385,11 +365,7 @@
     }
 
     // ================== متغيرات عامة ==================
-    let phoneQueue = [];              
-    let currentIdx = 0;               
-    let fixedAmountValue = "0";        
-
-    let list = [];                     
+    let list = [];                     // القائمة الرئيسية للأرقام
     let fixedFees = 3;                 
     let fixedTransfer = 200;            
     let showDateUnderWeather = true;    
@@ -413,78 +389,9 @@
         if (!isNaN(val)) updateBatteryUI(val);
     });
 
-    // ================== دوال السحب (فقط من btnCancel) ==================
-    function setupDraggable(btnIds, containerId) {
-        const container = document.getElementById(containerId);
-        let isDragging = false, startY, initialTranslateY = 0, currentTranslateY = 0;
-
-        const startDrag = (e) => {
-            isDragging = true;
-            startY = e.clientY || e.touches[0].clientY;
-            e.preventDefault();
-        };
-
-        btnIds.forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                btn.addEventListener('mousedown', startDrag);
-                btn.addEventListener('touchstart', startDrag, { passive: false });
-            }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            currentTranslateY = initialTranslateY + (e.clientY - startY);
-            container.style.transform = `translateY(${currentTranslateY}px)`;
-        });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            currentTranslateY = initialTranslateY + (e.touches[0].clientY - startY);
-            container.style.transform = `translateY(${currentTranslateY}px)`;
-            e.preventDefault();
-        }, { passive: false });
-
-        window.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                initialTranslateY = currentTranslateY;
-            }
-        });
-
-        window.addEventListener('touchend', () => {
-            if (isDragging) {
-                isDragging = false;
-                initialTranslateY = currentTranslateY;
-            }
-        });
-    }
-
-    setupDraggable(['btnCancel'], 'ussdContainer');
-    setupDraggable(['navDragBtn'], 'navContainer');
-
     // تعطيل أزرار الإرسال والإلغاء نهائياً (لا تعمل)
     document.getElementById('btnSend').onclick = (e) => { e.preventDefault(); return false; };
     document.getElementById('btnCancel').onclick = (e) => { e.preventDefault(); return false; };
-
-    // ================== دوال الإعدادات القديمة ==================
-    function toggleSettings() {
-        const panel = document.getElementById('bulkSettings');
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function saveAndClose() {
-        const text = document.getElementById('phoneList').value;
-        phoneQueue = text.split('\n').map(n => n.trim()).filter(n => n !== "");
-        fixedAmountValue = document.getElementById('fixedAmount').value || "0";
-        currentIdx = 0;
-        if(phoneQueue.length > 0) {
-            alert(`تم الحفظ بنجاح.`);
-            toggleSettings();
-        } else {
-            alert("يرجى إدخال أرقام.");
-        }
-    }
 
     // ================== دوال إعدادات واتساب ==================
     function checkDuplicates() {
@@ -514,8 +421,11 @@
         const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
         const uniqueLines = [...new Set(lines)];
         area.value = uniqueLines.join('\n');
-        checkDuplicates();
+        // تحديث list بعد إزالة المكررات
+        list = uniqueLines;
         updateCounter();
+        saveData(); // حفظ فوري بعد التعديل
+        checkDuplicates();
     }
 
     function updateCounter() { 
@@ -534,8 +444,7 @@
         dateTypeChecked = document.getElementById('dateType').checked;
         updateCounter();
         closeWA();
-        phoneQueue = [...list];
-        currentIdx = 0;
+        saveData(); // حفظ الإعدادات والقائمة
         alert("تم حفظ الإعدادات المتطورة");
     };
 
@@ -618,7 +527,7 @@
             return;
         }
 
-        const phone = list.shift();
+        const phone = list.shift(); // استهلاك الرقم الأول
         document.getElementById('waNumbers').value = list.join('\n');
         updateCounter();
 
@@ -654,6 +563,8 @@
 
         updateWeatherUI();
         removeZeroFromClock();
+
+        // حفظ القائمة المحدثة بعد الاستهلاك
         saveData();
     });
 
@@ -746,13 +657,9 @@
         document.getElementById('dateType').checked = true;
         updateCounter();
         removeZeroFromClock();
+        saveData(); // حفظ بعد إعادة الضبط
         alert('تم إعادة الضبط للإعدادات الافتراضية');
-        saveData();
     }
-
-    window.handleSendClick = function() {
-        // لا تفعل شيئًا
-    };
 </script>
 </body>
 </html>
