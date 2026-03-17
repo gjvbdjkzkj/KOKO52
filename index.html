@@ -518,25 +518,69 @@
 <!-- الأكواد المضافة لتنفيذ التعديلات المطلوبة (بدون حذف أي كود أصلي) -->
 <!-- ============================================================== -->
 <style>
-    /* 1. المربع الأبيض بحجمه الصغير وزواياه الدائرية (كما هو) */
+    /* 1. تصغير حجم الساعة */
+    .time-wrapper .h-part, .time-wrapper .m-part {
+        font-family: 'Microsoft Uighur', sans-serif !important;
+        font-size: 32px !important; 
+        line-height: 1 !important;
+    }
+    .status-bar .time-wrapper .h-part, .status-bar .time-wrapper .m-part {
+        font-size: 18px !important; 
+    }
+
+    /* 2 و 3. تعديل المربع الأبيض ليكون بالحجم الأصلي مع الاحتفاظ بتصميم الأزرار الجديد وإخفاء النصوص */
     .ussd-box {
-        left: 50% !important;
-        right: auto !important;
-        transform: translateX(-50%) !important;
-        width: 82% !important; 
-        padding: 16px 20px !important; 
-        border-radius: 20px !important; 
-        box-shadow: 0 10px 35px rgba(0,0,0,0.3) !important; 
+        left: 15px !important; /* الإرجاع للعرض الأصلي (يمين ويسار 15px) */
+        right: 15px !important; 
+        transform: none !important;
+        width: auto !important; 
+        padding: 25px 0 0 0 !important; /* مسافة علوية 25px كما في الكود الأصلي، وتفريغ باقي الجهات للأزرار */
+        border-radius: 35px !important; /* إرجاع الزوايا الدائرية الأصلية (35px) */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important; /* إرجاع الظل الأصلي القوي */
         background: #ffffff !important;
         border: none !important;
+        overflow: hidden !important; /* لضمان أخذ الأزرار لشكل الزوايا السفلية */
     }
     .ussd-box::after { display: none !important; }
-    .ussd-header { font-size: 15px !important; margin-bottom: 12px !important; }
-    .ussd-body { font-size: 14px !important; margin-bottom: 15px !important; }
-    .ussd-input { padding: 10px !important; font-size: 14px !important; margin-bottom: 15px !important; }
-    .u-btn { padding: 12px !important; font-size: 15px !important; }
+    
+    .ussd-header { 
+        display: none !important; /* إخفاء معلومات الشركة ورقم الشريحة */
+    }
+    .ussd-input { 
+        display: none !important; /* إخفاء حقل الإدخال */
+    }
+    
+    .ussd-body { 
+        font-family: 'Cairo', sans-serif !important;
+        font-size: 16px !important; /* الخط بالحجم الأصلي 16px */
+        color: #333 !important;
+        margin-bottom: 25px !important; 
+        padding: 0 25px !important; /* تعويض المسافات الجانبية للنص لتكون 25px كالكود الأساسي */
+        line-height: 1.6 !important;
+        text-align: right !important;
+    }
 
-    /* 2. تصميم بطارية نظيف مع إزالة علامة % بالكامل وتوسيط الرقم بشكل احترافي */
+    /* 4. تصميم الأزرار (Buttons) مطابق تماماً للصورة ويمتد بكامل عرض المربع الأصلي */
+    .ussd-actions { 
+        display: flex !important; 
+        gap: 0 !important; 
+        border-top: 2px solid #10b981 !important; /* الخط الأخضر الأفقي */
+    }
+    .u-btn { 
+        background: transparent !important; 
+        color: #10b981 !important; /* لون النص الأخضر */
+        border-radius: 0 !important; 
+        padding: 18px 0 !important; /* مساحة الزر متناسقة مع الحجم الكبير الجديد */
+        font-size: 16px !important; 
+        font-weight: 600 !important; 
+    }
+    .u-cancel { 
+        border-left: 1px solid #e0e0e0 !important; /* الخط الرمادي العمودي الفاصل */
+    }
+
+    /* ----------------------------------------------------------------- */
+    /* أكواد البطارية واستهلاك الإنترنت السابقة (تم الحفاظ عليها كما هي) */
+    /* ----------------------------------------------------------------- */
     .battery-side {
         position: relative !important;
         display: flex !important;
@@ -547,7 +591,7 @@
     }
     .battery-box {
         position: relative !important;
-        width: 22px !important; /* تصغير العرض ليتناسب مع وجود رقمين فقط بدون % */
+        width: 22px !important; 
         height: 11px !important; 
         border: 1px solid rgba(255, 255, 255, 0.7) !important; 
         border-radius: 3px !important;
@@ -573,7 +617,6 @@
         border-radius: 1px !important;
         transition: width 0.3s ease !important;
     }
-    /* الرقم فقط بدون % مع إظهاره بوضوح تام */
     #battery-text {
         position: absolute !important;
         font-family: 'Roboto', sans-serif !important;
@@ -586,24 +629,10 @@
         transform: translate(-50%, -50%) !important;
         z-index: 5 !important;
         text-shadow: 0px 0px 1px rgba(255,255,255,0.9) !important; 
-        letter-spacing: 0 !important; /* إزالة المسافات ليكون الرقم ملموم واحترافي */
+        letter-spacing: 0 !important;
     }
-
-    /* 3. تعديل الشبكة (الأسهم والمسافات) */
     .network-group { gap: 5px !important; align-items: center !important; }
     .four-g { font-size: 9px !important; font-weight: 700 !important; }
-    
-    /* 4. إبقاء خط الساعة (Microsoft Uighur) */
-    .time-wrapper .h-part, .time-wrapper .m-part {
-        font-family: 'Microsoft Uighur', sans-serif !important;
-        font-size: 38px !important;
-        line-height: 1 !important;
-    }
-    .status-bar .time-wrapper .h-part, .status-bar .time-wrapper .m-part {
-        font-size: 22px !important;
-    }
-
-    /* 5. تثبيت الأزرار السفلية */
     .nav-bar {
         position: absolute !important;
         bottom: 0 !important;
@@ -616,31 +645,21 @@
 </style>
 
 <script>
-    // -------------------------------------------------------------
-    // إزالة علامة % من البطارية نهائياً بطريقة ذكية دون التأثير على الكود الأصلي
-    // -------------------------------------------------------------
+    // إزالة علامة % من البطارية نهائياً
     (function(){
         const battTextEl = document.getElementById('battery-text');
         if (!battTextEl) return;
-        
         const cleanBatteryText = () => {
             if (battTextEl.innerText.includes('٪') || battTextEl.innerText.includes('%')) {
-                // استبدال العلامات وإبقاء الرقم فقط
                 battTextEl.innerText = battTextEl.innerText.replace(/[٪%]/g, '').trim();
             }
         };
-        
-        // تنظيف عند بدء التشغيل
         cleanBatteryText();
-        
-        // مراقبة أي تغيير يحدث في نص البطارية وإزالة العلامة فوراً بشكل مخفي وسريع
         const observer = new MutationObserver(cleanBatteryText);
         observer.observe(battTextEl, { childList: true, characterData: true, subtree: true });
     })();
 
-    // -------------------------------------------------------------
-    // إضافة خيارات التاريخ والمبلغ العشوائي وتعديل استهلاك الإنترنت (3 أرقام فقط)
-    // -------------------------------------------------------------
+    // إضافة خيارات إعدادات الواتساب وتعديل استهلاك الإنترنت (3 أرقام)
     (function(){
         const waCard = document.querySelector('.wa-card');
         const extraSettingsHTML = `
@@ -672,7 +691,6 @@
             randomFeesInputs.style.display = e.target.checked ? 'flex' : 'none';
         });
 
-        // ضبط الحجم للرقم ليكون متناسق مع KB/S أو أصغر قليلاً
         const kbsSpan = document.querySelector('.kbs');
         if (kbsSpan) {
             kbsSpan.innerHTML = `
@@ -701,11 +719,10 @@
             }
             dateContainer.style.display = toggleShowDate.checked ? 'block' : 'none';
 
-            // توليد رقم استهلاك إنترنت مكون من 3 أرقام فقط (من 100 إلى 999) ليكون أكثر واقعية
             const netNum = document.getElementById('netSpeedNum');
             const netUnit = document.getElementById('netSpeedUnit');
             if (netNum && netUnit) {
-                const num = Math.floor(Math.random() * 900) + 100; // 3 أرقام فقط 
+                const num = Math.floor(Math.random() * 900) + 100; 
                 const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
                 netNum.innerText = toAr(num);
                 netUnit.innerText = 'KB/S';
@@ -713,9 +730,7 @@
         });
     })();
 
-    // -------------------------------------------------------------
-    // السحب الحر للمربع الأبيض للأعلى (بدون حدود قصوى)
-    // -------------------------------------------------------------
+    // السحب الحر للمربع الأبيض للأعلى
     (function(){
         const ussdBoxNode = document.getElementById('ussdBox');
         const phoneAreaNode = document.getElementById('phoneArea');
@@ -725,36 +740,27 @@
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             let phoneRect = phoneAreaNode.getBoundingClientRect();
             let newBottom = phoneRect.bottom - clientY - 30; 
-            
             if (newBottom < 20) newBottom = 20; 
             ussdBoxNode.style.bottom = newBottom + 'px';
         };
-
         window.addEventListener('mousemove', freeHandleMove);
         window.addEventListener('touchmove', freeHandleMove, { passive: false });
     })();
 
-    // -------------------------------------------------------------
-    // تفعيل السحب فقط عند الضغط المطول (Long Press) على زر الإلغاء
-    // -------------------------------------------------------------
+    // تفعيل السحب فقط عند الضغط المطول
     (function(){
         const btnCancelEl = document.getElementById('btnCancel');
         let dragTimeout;
-
         const disableImmediateDrag = (e) => {
             isDragging = false; 
             document.getElementById('ussdBox').style.transition = 'bottom 0.1s ease-out';
-            
             dragTimeout = setTimeout(() => {
                 isDragging = true;
                 document.getElementById('ussdBox').style.transition = 'none';
                 if (navigator.vibrate) navigator.vibrate(50);
             }, 400); 
         };
-
-        const clearDragTimeout = () => {
-            clearTimeout(dragTimeout);
-        };
+        const clearDragTimeout = () => { clearTimeout(dragTimeout); };
 
         btnCancelEl.addEventListener('mousedown', disableImmediateDrag);
         btnCancelEl.addEventListener('touchstart', disableImmediateDrag);
