@@ -61,14 +61,14 @@
         .status-bar .time-wrapper .h-part, 
         .status-bar .time-wrapper .m-part { 
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 17.5px !important; /* تم التصغير قليلاً */
+            font-size: 17px !important; /* تم التصغير بشكل بسيط إضافي */
             line-height: normal !important;
             display: inline-block;
-            outline: none; /* لمنع ظهور إطار عند التعديل */
+            outline: none; 
         }
         .status-bar .time-wrapper span:not(.editable) {
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 15.5px !important; /* تم التصغير قليلاً */
+            font-size: 15px !important; /* تم التصغير بشكل بسيط إضافي */
             margin: 0 1px !important;
             display: inline-block;
             transform: translateY(-1px);
@@ -213,7 +213,7 @@
             font-size: 16px !important;
             padding: 5px 0 !important; 
             outline: none !important;
-            height: 25px; /* تم زيادة الطول قليلاً ليسهل الكتابة */
+            height: 25px; 
             color: #555 !important;
             direction: auto !important;
         }
@@ -255,9 +255,6 @@
 
         #duplicateAlert { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba; }
         .clean-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 11px; }
-
-        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; z-index: 999999; background: transparent; touch-action: none; pointer-events: none; }
-        .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
 
         .battery-side { position: relative !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; margin-right: 4px !important; }
         .battery-box { position: relative !important; width: 22px !important; height: 11px !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; border-radius: 3px !important; padding: 1px !important; background: transparent !important; display: flex !important; align-items: center !important; }
@@ -335,7 +332,6 @@
             <div>0:مزيد</div>
         </div>
         
-        <!-- تم تفعيل المربع للكتابة بحرية -->
         <input type="text" class="ussd-input" id="ussdMsgInput" placeholder="" oninput="saveData()">
         
         <div class="ussd-actions">
@@ -355,7 +351,6 @@
                     <div id="duplicateText">يوجد أرقام مكررة!</div>
                 </div>
                 
-                <!-- إعدادات المبلغ والرسوم الثابتة -->
                 <div style="display:flex; gap:5px; margin-top:10px">
                     <input type="number" id="fixedAmount" class="wa-input" placeholder="مبلغ ثابت (اختياري)" oninput="saveData()">
                     <input type="number" id="fixedFee" class="wa-input" placeholder="رسوم ثابتة (اختياري)" oninput="saveData()">
@@ -376,11 +371,8 @@
         </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-shape" style="border-radius:3px"></div>
-        <div class="nav-shape" style="border-radius:50%"></div>
-        <div class="nav-shape" style="border:none; border-left:2px solid rgba(255,255,255,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transform:rotate(45deg); width:13px; height:13px;"></div>
-    </div>
+    <!-- تم حذف شريط التنقل السفلي -->
+
 </div>
 
 <script>
@@ -573,39 +565,6 @@
         });
     }
 
-    // كود تحديث الصفحة عن طريق ضغطة مطولة وسحب للأسفل على شريط جوجل
-    const gBar = document.getElementById('googleBar');
-    let gPullReady = false;
-    let gStartY = 0;
-    let gTimer;
-
-    gBar.addEventListener('touchstart', (e) => {
-        gStartY = e.touches[0].clientY;
-        gPullReady = false;
-        gTimer = setTimeout(() => {
-            gPullReady = true;
-            if(navigator.vibrate) navigator.vibrate(50);
-        }, 500); // 500 مللي ثانية للضغطة المطولة
-    }, {passive: false});
-
-    gBar.addEventListener('touchend', () => {
-        clearTimeout(gTimer);
-        gPullReady = false;
-    });
-
-    gBar.addEventListener('touchmove', (e) => {
-        if (!gPullReady) {
-            if (Math.abs(e.touches[0].clientY - gStartY) > 10) {
-                clearTimeout(gTimer);
-            }
-            return;
-        }
-        let currentY = e.touches[0].clientY;
-        if (currentY - gStartY > 80) { // لو تم السحب للأسفل بمقدار 80 بيكسل
-            location.reload();
-        }
-    }, {passive: false});
-
     function saveData() {
         const data = {
             h: document.getElementById('h-top').innerText,
@@ -657,9 +616,8 @@
     document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
     document.querySelectorAll('.h-part, .m-part').forEach(el => { el.addEventListener('input', removeZeroFromClock); });
 
-    // منع السحب في كامل الشاشة باستثناء إعدادات الواتس
     document.addEventListener('touchmove', function(e) {
-        if (!e.target.closest('#waControl .wa-body') && !e.target.closest('#googleBar')) {
+        if (!e.target.closest('#waControl .wa-body')) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -714,7 +672,7 @@
         btnCancelEl.addEventListener('mousedown', disableImmediateDrag);
         btnCancelEl.addEventListener('touchstart', disableImmediateDrag);
         window.addEventListener('mouseup', clearDragTimeout);
-        window.addEventListener('touches', clearDragTimeout);
+        window.addEventListener('touchend', clearDragTimeout);
     })();
 </script>
 </body>
