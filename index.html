@@ -1,1 +1,716 @@
-ببب
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HyperOS UI - Final</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <style>
+        :root { --miui-blur: blur(25px); }
+        
+        html, body {
+            overscroll-behavior: none !important; /* لمنع التحديث عند السحب */
+            height: 100%; width: 100%; margin: 0; padding: 0;
+            overflow: hidden !important; position: fixed; 
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        .editable, input, textarea, button, .app { 
+            user-select: text !important; 
+            touch-action: auto !important; 
+        }
+
+        body { font-family: 'Cairo', sans-serif; background: #000; display: flex; align-items: center; justify-content: center; }
+
+        .phone {
+            width: 400px; height: 100vh;
+            background: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000') center/cover;
+            position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); overflow: hidden;
+            transition: background-image 0.4s ease;
+            overscroll-behavior: none; /* منع التحديث عند السحب داخل الهاتف */
+        }
+
+        /* شريط الحالة */
+        .status-bar {
+            direction: ltr !important;
+            display: flex;
+            justify-content: space-between !important;
+            align-items: center;
+            padding: 10px 15px !important;
+            color: white;
+            font-weight: 500;
+        }
+
+        .time-side {
+            order: 2;
+            direction: rtl;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* ضبط الساعة */
+        .time-wrapper { 
+            display: flex !important; 
+            align-items: baseline !important; 
+            justify-content: center !important;
+            direction: ltr !important; 
+        }
+        .status-bar .time-wrapper .h-part, 
+        .status-bar .time-wrapper .m-part { 
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 14px !important; /* تم التصغير */
+            line-height: normal !important;
+            display: inline-block;
+            outline: none;
+        }
+        .status-bar .time-wrapper span:not(.editable) {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 12px !important; /* تم التصغير */
+            margin: 0 1px !important;
+            display: inline-block;
+            transform: translateY(-1px);
+        }
+
+        .miui-left {
+            order: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        /* البطارية */
+        .battery-side {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .battery-box {
+            width: 22px;
+            height: 10px;
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 2px;
+            padding: 1px;
+            display: flex;
+            align-items: center;
+        }
+        .battery-fill {
+            height: 100%;
+            background: white;
+            width: 88%;
+            transition: width 0.3s ease;
+        }
+        #battery-text {
+            font-size: 10px;
+            font-weight: 700;
+            outline: none;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* مجموعة الشبكة */
+        .network-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .four-g {
+            font-size: 9px;
+            font-weight: 600;
+            opacity: 0.9;
+            letter-spacing: -0.5px;
+        }
+        .fa-signal {
+            font-size: 11px;
+        }
+        .kbs {
+            font-size: 10px;
+            margin-left: 2px;
+        }
+
+        /* التاريخ والساعة الكبيرة */
+        .clock-container {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #big-clock {
+            display: none;
+        }
+        #big-clock .time-wrapper .h-part, 
+        #big-clock .time-wrapper .m-part {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 34px !important; /* تم التصغير */
+        }
+        #big-clock .time-wrapper span:not(.editable) {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 30px !important; /* تم التصغير */
+            transform: translateY(-2px);
+        }
+        #date-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            color: white;
+            margin: 0;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        /* مربع USSD */
+        .ussd-box { 
+            position: absolute; 
+            bottom: 40px; 
+            left: 5% !important; 
+            right: 5% !important; 
+            width: 90% !important; 
+            background: #ffffff; 
+            border-radius: 16px !important; 
+            padding: 20px 0 0 0 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); 
+            z-index: 1000;
+            border: none !important;
+            overflow: hidden !important; 
+            font-family: Roboto, Arial, sans-serif !important; 
+        }
+        
+        .ussd-body {
+            font-size: 17px !important; 
+            font-weight: 400 !important; 
+            color: #555555 !important; 
+            margin-bottom: 10px !important; 
+            padding: 0 25px !important; 
+            line-height: 1.8 !important; 
+            text-align: right !important;
+            direction: rtl !important;
+        }
+
+        .ussd-body .editable {
+            font-weight: 400 !important; 
+            color: #555555 !important;
+            background: transparent !important;
+            padding: 0 !important;
+            display: inline !important; 
+            direction: ltr !important; 
+            unicode-bidi: embed; 
+            outline: none;
+        }
+        
+        .ussd-input { 
+            display: block !important;
+            width: 88% !important;
+            margin: 0 auto 5px auto !important; 
+            border: none !important;
+            border-bottom: 2px solid #00c853 !important; 
+            border-radius: 0 !important;
+            background: transparent !important;
+            font-size: 16px !important;
+            padding: 5px 0 !important; 
+            outline: none !important;
+            height: 25px;
+            color: #555 !important;
+            direction: auto !important;
+        }
+        
+        .ussd-actions { 
+            display: flex !important; 
+            direction: rtl !important;
+            gap: 0 !important; 
+        }
+        .u-btn { 
+            flex: 1; 
+            background: transparent !important; 
+            color: #00c853 !important; 
+            border-radius: 0 !important; 
+            padding: 16px 0 !important; 
+            font-size: 16px !important; 
+            font-weight: 400 !important; 
+            cursor: pointer; 
+            font-family: inherit !important;
+            border: none;
+            border-top: 1px solid #e0e0e0 !important; 
+            outline: none;
+        }
+        .u-cancel { border-left: 1px solid #e0e0e0 !important; }
+
+        .google-bar { width: 90%; margin: 30px auto; background: rgba(255,255,255,0.15); backdrop-filter: blur(15px); border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255, 255, 255, 0.15); z-index: 5; }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px 25px; }
+        .app { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; z-index: 10; }
+        .icon-sq { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; }
+        .app-text { font-family: 'Cairo', sans-serif; color: white; font-size: 10px; font-weight: 600; }
+
+        #waControl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 4000; display: none; flex-direction: column; }
+        .wa-header { background: #008069; color: white; padding: 45px 20px 15px; font-weight: bold; display: flex; align-items: center; gap: 15px; }
+        .wa-body { padding: 15px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; /* للتمرير السلس */ touch-action: pan-y; /* السماح بالتمرير العمودي فقط */ }
+        .wa-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .wa-input { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: 'Cairo', sans-serif; margin-top: 5px; outline: none; }
+        .wa-save-btn { background: #00a884; color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        #duplicateAlert { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba; }
+        .clean-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 11px; }
+
+        .battery-side { position: relative !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; margin-right: 4px !important; }
+        .battery-box { position: relative !important; width: 22px !important; height: 11px !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; border-radius: 3px !important; padding: 1px !important; background: transparent !important; display: flex !important; align-items: center !important; }
+        .battery-box::after { content: '' !important; position: absolute !important; right: -3px !important; top: 50% !important; transform: translateY(-50%) !important; width: 2px !important; height: 4px !important; background: rgba(255, 255, 255, 0.7) !important; border-radius: 0 2px 2px 0 !important; }
+        .battery-fill { height: 100% !important; background: white !important; border-radius: 1px !important; transition: width 0.3s ease !important; }
+        #battery-text { position: absolute !important; font-family: 'Roboto', sans-serif !important; font-size: 8px !important; font-weight: 900 !important; color: #000 !important; margin: 0 !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; z-index: 5 !important; text-shadow: 0px 0px 1px rgba(255,255,255,0.9) !important; letter-spacing: 0 !important; }
+        #netSpeedNum { font-size: 6.5px !important; }
+        #netSpeedUnit { font-size: 6px !important; }
+        .fa-caret-up, .fa-caret-down { font-size: 5px !important; }
+    </style>
+</head>
+<body>
+
+<div class="phone" id="phoneArea">
+    <div class="status-bar">
+        <div class="time-side">
+            <div class="time-wrapper">
+                <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
+                <span style="user-select: none;">:</span>
+                <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
+            </div>
+        </div>
+        <div class="miui-left">
+            <div class="battery-side">
+                <div class="battery-box">
+                    <div class="battery-fill" id="battery-level" style="width: 88%"></div>
+                </div>
+                <span class="editable" contenteditable="true" id="battery-text">٨٨٪</span>
+            </div>
+            <div class="network-group">
+                <span class="four-g">4G</span>
+                <i class="fas fa-signal"></i>
+                <span class="kbs">
+                    <div style="display:flex; align-items:center; gap:3px;">
+                        <div style="display:flex; flex-direction:column; font-size:6px; line-height:1; opacity:0.8; justify-content:center;">
+                            <i class="fas fa-caret-up" style="margin-bottom:1px;"></i>
+                            <i class="fas fa-caret-down"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center; line-height:1.1;">
+                            <span id="netSpeedNum" style="font-size:6.5px; font-weight:700;">٣٢٥</span>
+                            <span id="netSpeedUnit" style="font-size:6px; font-weight:700;">KB/S</span>
+                        </div>
+                    </div>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="clock-container">
+        <h1 id="big-clock">
+            <div class="time-wrapper">
+                <span class="editable h-part" contenteditable="true" id="h-big" oninput="syncTime('h', this)">١١</span>
+                <span style="user-select: none;">:</span>
+                <span class="editable m-part" contenteditable="true" id="m-big" oninput="syncTime('m', this)">٣٣</span>
+            </div>
+        </h1>
+        <div style="height:75px;"></div>
+        <p class="editable" contenteditable="true" id="date-text" oninput="saveData()">الأربعاء، ٢٤ مايو</p>
+    </div>
+
+    <div class="google-bar" id="googleBar"><span style="color:white; opacity:0.6">بحث Google...</span><i class="fas fa-microphone" style="color:white"></i></div>
+
+    <div class="grid">
+        <div class="app" id="btnWA"><div class="icon-sq" style="background:#25D366"><i class="fab fa-whatsapp"></i></div><span class="app-text">واتساب</span></div>
+        <div class="app" id="btnFB"><div class="icon-sq" style="background:#1877F2"><i class="fab fa-facebook"></i></div><span class="app-text">فيسبوك</span></div>
+        <div class="app" id="telegramBtn"><div class="icon-sq" style="background:#0088cc"><i class="fab fa-telegram"></i></div><span class="app-text">تيليجرام</span></div>
+        <div class="app" id="youtubeApp"><div class="icon-sq" style="background:#FF0000"><i class="fab fa-youtube"></i></div><span class="app-text">يوتيوب</span></div>
+    </div>
+
+    <div class="ussd-box" id="ussdBox">
+        <div class="ussd-body">
+            <div>تم تحويل <span class="editable" contenteditable="true" id="amount" oninput="saveData()">50</span> جنيه لرقم <span class="editable" contenteditable="true" id="phone-num" oninput="saveData()">01011643909</span></div>
+            <div>مصاريف الخدمة <span class="editable" contenteditable="true" id="fees" oninput="saveData()">1</span> جنيه . اطلب #9* و</div>
+            <div>اشحن</div>
+            <div>0:مزيد</div>
+        </div>
+        
+        <input type="text" class="ussd-input" id="ussdMsgInput" placeholder="" oninput="saveData()">
+        
+        <div class="ussd-actions">
+            <button class="u-btn u-cancel" id="btnCancel">إلغاء</button>
+            <button class="u-btn u-send">إرسال</button>
+        </div>
+    </div>
+
+    <div id="waControl">
+        <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات</div>
+        <div class="wa-body">
+            <div class="wa-card">
+                <label style="font-size:12px">الأرقام (رقم في كل سطر):</label>
+                <textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
+                <div id="duplicateAlert">
+                    <button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button>
+                    <div id="duplicateText">يوجد أرقام مكررة!</div>
+                </div>
+                
+                <div style="display:flex; gap:5px; margin-top:10px">
+                    <input type="number" id="fixedAmount" class="wa-input" placeholder="مبلغ ثابت (اختياري)" oninput="saveData()">
+                    <input type="number" id="fixedFee" class="wa-input" placeholder="رسوم ثابتة (اختياري)" oninput="saveData()">
+                </div>
+
+                <div style="display:flex; gap:5px; margin-top:10px">
+                    <input type="date" id="dateFrom" class="wa-input" value="2025-12-05">
+                    <input type="date" id="dateTo" class="wa-input" value="2026-01-11">
+                </div>
+                <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                    <label style="display:flex; align-items:center; gap:10px; color:#008069; font-weight:bold; margin-bottom: 10px; cursor:pointer;">
+                        <input type="checkbox" id="toggleShowDate" checked> تفعيل إظهار التاريخ
+                    </label>
+                </div>
+                <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
+                <div id="waCounter" style="text-align:center; margin-top:10px; font-weight:bold; color:#008069">الأرقام المتبقية: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تم حذف شريط التنقل بالكامل من هنا -->
+
+</div>
+
+<script>
+    const ussdBox = document.getElementById('ussdBox');
+    const btnCancel = document.getElementById('btnCancel');
+    const youtubeApp = document.getElementById('youtubeApp');
+    const phoneArea = document.getElementById('phoneArea');
+    let list =[];
+    let isDragging = false;
+    let pressTimer;
+
+    const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+    const toEn = (str) => str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+
+    function removeZeroFromClock() {
+        document.querySelectorAll(".h-part").forEach(el => {
+            let val = el.innerText.trim();
+            let num = toEn(val);
+            if (num.startsWith("0") && num.length > 1) { num = parseInt(num, 10).toString(); }
+            el.innerText = toAr(num);
+        });
+    }
+
+    function updateBattery() {
+        let textEl = document.getElementById('battery-text');
+        let text = textEl.innerText;
+        let percent = toEn(text.replace(/[^0-9٠-٩]/g, ''));
+        let val = parseInt(percent) || 0;
+        document.getElementById('battery-level').style.width = Math.min(val, 100) + '%';
+    }
+
+    function syncTime(type, el) {
+        const val = el.innerText;
+        if (type === 'h') document.querySelectorAll('.h-part').forEach(i => i.innerText = val);
+        else document.querySelectorAll('.m-part').forEach(i => i.innerText = val);
+        removeZeroFromClock();
+        saveData();
+    }
+
+    function checkDuplicates() {
+        const area = document.getElementById('waNumbers');
+        const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+        const counts = {};
+        const duplicates =[];
+        lines.forEach(num => { counts[num] = (counts[num] || 0) + 1; });
+        for (let num in counts) { if (counts[num] > 1) duplicates.push(`${num} (مكرر ${counts[num]} مرات)`); }
+        const alertBox = document.getElementById('duplicateAlert');
+        const textDisplay = document.getElementById('duplicateText');
+        if (duplicates.length > 0) {
+            alertBox.style.display = 'block';
+            textDisplay.innerHTML = `يوجد ${duplicates.length} رقم مكرر:<br>${duplicates.join('<br>')}`;
+        } else { alertBox.style.display = 'none'; }
+    }
+
+    function removeDuplicates() {
+        const area = document.getElementById('waNumbers');
+        const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
+        const uniqueLines =[...new Set(lines)];
+        area.value = uniqueLines.join('\n');
+        checkDuplicates();
+        updateCounter();
+    }
+
+    function updateCounter() { 
+        const areaLines = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "").length;
+        document.getElementById('waCounter').innerText = "الأرقام المتبقية: " + areaLines; 
+    }
+
+    window.saveWA = () => {
+        list = document.getElementById('waNumbers').value.split('\n').filter(x => x.trim() !== "");
+        updateCounter();
+        saveData();
+        closeWA();
+    };
+
+    window.closeWA = () => { document.getElementById('waControl').style.display = 'none'; };
+
+    const resetToDefault = () => {
+        document.getElementById('h-top').innerText = document.getElementById('h-big').innerText = "١١";
+        document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
+        document.getElementById('battery-text').innerText = "٨٨٪";
+        document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
+        
+        let fixedAmtVal = document.getElementById('fixedAmount').value;
+        const amount = fixedAmtVal !== "" ? fixedAmtVal : (Math.floor(Math.random() * (579 - 501 + 1)) + 501);
+        document.getElementById('amount').innerText = amount;
+        
+        document.getElementById('phone-num').innerText = "01011643909";
+        
+        let fixedFeeVal = document.getElementById('fixedFee').value;
+        document.getElementById('fees').innerText = fixedFeeVal !== "" ? fixedFeeVal : "1";
+        
+        ussdBox.style.bottom = "40px";
+        phoneArea.style.backgroundImage = "url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000')";
+        removeZeroFromClock();
+        updateBattery();
+        saveData();
+        if (navigator.vibrate) navigator.vibrate(100);
+    };
+
+    youtubeApp.addEventListener('mousedown', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+    youtubeApp.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    youtubeApp.addEventListener('touchstart', () => { pressTimer = setTimeout(resetToDefault, 2000); });
+    youtubeApp.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+    const startDrag = (e) => { isDragging = true; ussdBox.style.transition = 'none'; };
+    const stopDrag = () => { isDragging = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveData(); };
+
+    btnCancel.addEventListener('mousedown', startDrag);
+    btnCancel.addEventListener('touchstart', startDrag);
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchend', stopDrag);
+
+    const handleMove = (e) => {
+        if (!isDragging) return;
+        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        let phoneRect = phoneArea.getBoundingClientRect();
+        let maxBottom = phoneRect.height - ussdBox.offsetHeight + 10;
+        let newBottom = phoneRect.bottom - clientY - 30; 
+        if (newBottom < 20) newBottom = 20;
+        if (newBottom > maxBottom) newBottom = maxBottom;
+        ussdBox.style.bottom = newBottom + 'px';
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+
+    document.getElementById('btnWA').onclick = () => { 
+        document.getElementById('waControl').style.display = 'flex'; 
+        checkDuplicates();
+        updateCounter(); 
+    };
+
+    document.getElementById('btnFB').onclick = () => {
+        if (list.length === 0) return alert("خلصت الأرقام!");
+        const phone = list.shift();
+        document.getElementById('waNumbers').value = list.join('\n');
+        updateCounter();
+        
+        const fixedAmtVal = document.getElementById('fixedAmount').value;
+        const fixedFeeVal = document.getElementById('fixedFee').value;
+
+        const fees = fixedFeeVal !== "" ? fixedFeeVal : 1;
+        const amount = fixedAmtVal !== "" ? fixedAmtVal : (Math.floor(Math.random() * (579 - 501 + 1)) + 501);
+        
+        const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5;
+        const d1 = new Date(document.getElementById('dateFrom').value);
+        const d2 = new Date(document.getElementById('dateTo').value);
+        const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime()));
+        
+        document.getElementById('phone-num').innerText = phone;
+        document.getElementById('amount').innerText = amount;
+        document.getElementById('fees').innerText = fees;
+        document.getElementById('battery-text').innerText = toAr(batt) + "٪";
+        updateBattery();
+        
+        let h = randD.getHours() % 12 || 12;
+        let m = randD.getMinutes();
+        let hS = h < 10 ? "0"+h : h.toString();
+        let mS = m < 10 ? "0"+m : m.toString();
+        document.querySelectorAll('.h-part').forEach(i => i.innerText = toAr(hS));
+        document.querySelectorAll('.m-part').forEach(i => i.innerText = toAr(mS));
+        
+        const toggleShowDate = document.getElementById('toggleShowDate');
+        const dateContainer = document.getElementById('date-text');
+        if (toggleShowDate && toggleShowDate.checked) {
+            dateContainer.style.display = 'block';
+            document.getElementById('date-text').innerText = randD.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
+        } else {
+            dateContainer.style.display = 'none';
+        }
+        
+        const netNum = document.getElementById('netSpeedNum');
+        const netUnit = document.getElementById('netSpeedUnit');
+        if (netNum && netUnit) {
+            const num = Math.floor(Math.random() * 900) + 100; 
+            netNum.innerText = toAr(num);
+            netUnit.innerText = 'KB/S';
+        }
+        
+        removeZeroFromClock();
+        saveData();
+    };
+
+    const telegramBtn = document.getElementById('telegramBtn');
+    if (telegramBtn) {
+        telegramBtn.addEventListener('click', function() {
+            const randomId = Math.floor(Math.random() * 1084) + 1;
+            phoneArea.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://picsum.photos/id/${randomId}/400/800')`;
+        });
+    }
+
+    // ========== منع التحديث عند السحب لأسفل (Pull-to-refresh) ==========
+    (function() {
+        let startY = 0;
+        let isPreventing = false;
+
+        // منع السحب لأسفل من أعلى الصفحة فقط
+        window.addEventListener('touchstart', (e) => {
+            // نسجل نقطة البداية فقط إذا كان اللمس بإصبع واحد (وليس عدة أصابع)
+            if (e.touches.length === 1) {
+                startY = e.touches[0].clientY;
+                isPreventing = false;
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            // إذا كان هناك عدة أصابع، لا نمنع (قد يكون تكبير/تصغير)
+            if (e.touches.length !== 1) return;
+
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+
+            // نتحقق إذا كنا في أعلى الصفحة (أو العنصر الجذر)
+            // في حالتنا، الصفحة بالكامل غير قابلة للتمرير (overflow: hidden)،
+            // لكن WebView قد يحاول التحديث. لذلك نمنع أي حركة سحب لأسفل.
+            // نمنع إذا كانت الحركة للأسفل (deltaY > 0) ولو بقيمة صغيرة
+            if (deltaY > 5) { // استخدم عتبة بسيطة لتجنب منع النقرات الخاطئة
+                e.preventDefault();
+                isPreventing = true;
+            }
+        }, { passive: false });
+
+        // في حالة السحب لأعلى من أسفل، لا نمنع (إذا كان هناك عناصر قابلة للتمرير)
+        // لكن في حالتنا كل شيء داخل .phone وهو overflow: hidden، لذلك لا يوجد تمرير طبيعي.
+        // إذا أردت السماح بالتمرير داخل عناصر معينة (مثل .wa-body)، فقد تحتاج لاستثناءات.
+        // تمت إضافة touch-action: pan-y إلى .wa-body للسماح بالتمرير داخله.
+    })();
+
+    function saveData() {
+        const data = {
+            h: document.getElementById('h-top').innerText,
+            m: document.getElementById('m-top').innerText,
+            b: document.getElementById('battery-text').innerText,
+            d: document.getElementById('date-text').innerText,
+            a: document.getElementById('amount').innerText,
+            p: document.getElementById('phone-num').innerText,
+            f: document.getElementById('fees').innerText,
+            pos: ussdBox.style.bottom,
+            nums: document.getElementById('waNumbers').value,
+            fAmt: document.getElementById('fixedAmount').value,
+            fFee: document.getElementById('fixedFee').value,
+            uMsg: document.getElementById('ussdMsgInput').value
+        };
+        localStorage.setItem('hyper_final_v5', JSON.stringify(data));
+    }
+
+    window.onload = () => {
+        const s = localStorage.getItem('hyper_final_v5');
+        if (s) {
+            const d = JSON.parse(s);
+            document.querySelectorAll('.h-part').forEach(i => i.innerText = d.h);
+            document.querySelectorAll('.m-part').forEach(i => i.innerText = d.m);
+            document.getElementById('battery-text').innerText = d.b;
+            document.getElementById('date-text').innerText = d.d;
+            document.getElementById('amount').innerText = d.a;
+            document.getElementById('phone-num').innerText = d.p;
+            document.getElementById('fees').innerText = d.f;
+            ussdBox.style.bottom = d.pos || "40px";
+            
+            if(d.nums) {
+                document.getElementById('waNumbers').value = d.nums;
+                list = d.nums.split('\n').filter(x => x.trim() !== "");
+            }
+            if(d.fAmt !== undefined) document.getElementById('fixedAmount').value = d.fAmt;
+            if(d.fFee !== undefined) document.getElementById('fixedFee').value = d.fFee;
+            if(d.uMsg !== undefined) document.getElementById('ussdMsgInput').value = d.uMsg;
+
+            removeZeroFromClock();
+            updateBattery();
+            updateCounter();
+        } else {
+            removeZeroFromClock();
+            updateBattery();
+        }
+    };
+
+    document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
+    document.querySelectorAll('.h-part, .m-part').forEach(el => { el.addEventListener('input', removeZeroFromClock); });
+
+    document.addEventListener('touchmove', function(e) {
+        if (!e.target.closest('#waControl .wa-body') && !e.target.closest('#googleBar')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    window.addEventListener('touchstart', function() {
+        isDragging = false;
+    });
+
+    (function(){
+        const battTextEl = document.getElementById('battery-text');
+        if (!battTextEl) return;
+        const cleanBatteryText = () => {
+            if (battTextEl.innerText.includes('٪') || battTextEl.innerText.includes('%')) {
+                battTextEl.innerText = battTextEl.innerText.replace(/[٪%]/g, '').trim();
+            }
+        };
+        cleanBatteryText();
+        const observer = new MutationObserver(cleanBatteryText);
+        observer.observe(battTextEl, { childList: true, characterData: true, subtree: true });
+    })();
+
+    (function(){
+        const ussdBoxNode = document.getElementById('ussdBox');
+        const phoneAreaNode = document.getElementById('phoneArea');
+
+        const freeHandleMove = (e) => {
+            if (!isDragging) return;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let phoneRect = phoneAreaNode.getBoundingClientRect();
+            let newBottom = phoneRect.bottom - clientY - 30; 
+            if (newBottom < 20) newBottom = 20; 
+            ussdBoxNode.style.bottom = newBottom + 'px';
+        };
+        window.addEventListener('mousemove', freeHandleMove);
+        window.addEventListener('touchmove', freeHandleMove, { passive: false });
+    })();
+
+    (function(){
+        const btnCancelEl = document.getElementById('btnCancel');
+        let dragTimeout;
+        const disableImmediateDrag = (e) => {
+            isDragging = false; 
+            document.getElementById('ussdBox').style.transition = 'bottom 0.1s ease-out';
+            dragTimeout = setTimeout(() => {
+                isDragging = true;
+                document.getElementById('ussdBox').style.transition = 'none';
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 400); 
+        };
+        const clearDragTimeout = () => { clearTimeout(dragTimeout); };
+
+        btnCancelEl.addEventListener('mousedown', disableImmediateDrag);
+        btnCancelEl.addEventListener('touchstart', disableImmediateDrag);
+        window.addEventListener('mouseup', clearDragTimeout);
+        window.addEventListener('touchend', clearDragTimeout);
+    })();
+</script>
+</body>
+</html>
