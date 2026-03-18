@@ -12,7 +12,7 @@
         :root { --miui-blur: blur(25px); }
         
         html, body {
-            overscroll-behavior: none !important; /* هذا السطر يمنع السحب للتحديث */
+            overscroll-behavior: none !important; /* لمنع التحديث عند السحب */
             height: 100%; width: 100%; margin: 0; padding: 0;
             overflow: hidden !important; position: fixed; 
         }
@@ -51,7 +51,7 @@
             font-weight: 500;
         }
         
-        /* ضبط الساعة لتكون مستقيمة وبدون اختلال في مستوى الأرقام (الصفر وغيرها) */
+        /* ضبط الساعة */
         .time-wrapper { 
             display: flex !important; 
             align-items: baseline !important; 
@@ -61,14 +61,14 @@
         .status-bar .time-wrapper .h-part, 
         .status-bar .time-wrapper .m-part { 
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 16px !important; /* تم التصغير */
+            font-size: 15.5px !important; /* تم التصغير */
             line-height: normal !important;
             display: inline-block;
-            outline: none; /* لمنع ظهور إطار عند التعديل */
+            outline: none;
         }
         .status-bar .time-wrapper span:not(.editable) {
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 14px !important; /* تم التصغير */
+            font-size: 13.5px !important; /* تم التصغير */
             margin: 0 1px !important;
             display: inline-block;
             transform: translateY(-1px);
@@ -146,11 +146,11 @@
         #big-clock .time-wrapper .h-part, 
         #big-clock .time-wrapper .m-part {
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 38px !important; /* تم التصغير */
+            font-size: 36px !important; /* تم التصغير */
         }
         #big-clock .time-wrapper span:not(.editable) {
             font-family: 'Microsoft Uighur', Arial, sans-serif !important;
-            font-size: 34px !important; /* تم التصغير */
+            font-size: 32px !important; /* تم التصغير */
             transform: translateY(-2px);
         }
         #date-text {
@@ -162,7 +162,7 @@
             outline: none;
         }
 
-        /* مربع USSD المطور - متطابق مع الصورة */
+        /* مربع USSD */
         .ussd-box { 
             position: absolute; 
             bottom: 40px; 
@@ -201,7 +201,6 @@
             outline: none;
         }
         
-        /* مربع الإدخال (الخط الأخضر) */
         .ussd-input { 
             display: block !important;
             width: 88% !important;
@@ -255,9 +254,6 @@
 
         #duplicateAlert { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba; }
         .clean-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 11px; }
-
-        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; z-index: 999999; background: transparent; touch-action: none; pointer-events: none; }
-        .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
 
         .battery-side { position: relative !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; margin-right: 4px !important; }
         .battery-box { position: relative !important; width: 22px !important; height: 11px !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; border-radius: 3px !important; padding: 1px !important; background: transparent !important; display: flex !important; align-items: center !important; }
@@ -374,11 +370,8 @@
         </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-shape" style="border-radius:3px"></div>
-        <div class="nav-shape" style="border-radius:50%"></div>
-        <div class="nav-shape" style="border:none; border-left:2px solid rgba(255,255,255,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transform:rotate(45deg); width:13px; height:13px;"></div>
-    </div>
+    <!-- تم حذف شريط التنقل بالكامل من هنا -->
+
 </div>
 
 <script>
@@ -571,37 +564,7 @@
         });
     }
 
-    const gBar = document.getElementById('googleBar');
-    let gPullReady = false;
-    let gStartY = 0;
-    let gTimer;
-
-    gBar.addEventListener('touchstart', (e) => {
-        gStartY = e.touches[0].clientY;
-        gPullReady = false;
-        gTimer = setTimeout(() => {
-            gPullReady = true;
-            if(navigator.vibrate) navigator.vibrate(50);
-        }, 500); 
-    }, {passive: false});
-
-    gBar.addEventListener('touchend', () => {
-        clearTimeout(gTimer);
-        gPullReady = false;
-    });
-
-    gBar.addEventListener('touchmove', (e) => {
-        if (!gPullReady) {
-            if (Math.abs(e.touches[0].clientY - gStartY) > 10) {
-                clearTimeout(gTimer);
-            }
-            return;
-        }
-        let currentY = e.touches[0].clientY;
-        if (currentY - gStartY > 80) { 
-            location.reload();
-        }
-    }, {passive: false});
+    // تم حذف كود تحديث الصفحة عند السحب على شريط جوجل
 
     function saveData() {
         const data = {
