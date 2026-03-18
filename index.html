@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>HyperOS UI - Final</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     
     <style>
@@ -50,8 +50,28 @@
             font-size: 16px;
             font-weight: 500;
         }
-        .time-wrapper { display: flex; direction: ltr; align-items: center; }
-        .h-part, .m-part { display: inline-block; outline: none; min-width: 5px; }
+        
+        /* ضبط الساعة لتكون مستقيمة وبدون اختلال في مستوى الأرقام (الصفر وغيرها) */
+        .time-wrapper { 
+            display: flex !important; 
+            align-items: baseline !important; 
+            justify-content: center !important;
+            direction: ltr !important; 
+        }
+        .status-bar .time-wrapper .h-part, 
+        .status-bar .time-wrapper .m-part { 
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 19px !important; 
+            line-height: normal !important;
+            display: inline-block;
+        }
+        .status-bar .time-wrapper span:not(.editable) {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 17px !important; 
+            margin: 0 1px !important;
+            display: inline-block;
+            transform: translateY(-1px);
+        }
 
         .miui-left {
             order: 1;
@@ -110,7 +130,7 @@
             margin-left: 2px;
         }
 
-        /* التاريخ */
+        /* التاريخ والساعة الكبيرة */
         .clock-container {
             text-align: center;
             color: white;
@@ -122,6 +142,16 @@
         #big-clock {
             display: none;
         }
+        #big-clock .time-wrapper .h-part, 
+        #big-clock .time-wrapper .m-part {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 42px !important; 
+        }
+        #big-clock .time-wrapper span:not(.editable) {
+            font-family: 'Microsoft Uighur', Arial, sans-serif !important;
+            font-size: 38px !important; 
+            transform: translateY(-2px);
+        }
         #date-text {
             font-family: 'Cairo', sans-serif;
             font-size: 16px;
@@ -130,65 +160,80 @@
             line-height: 1.5;
         }
 
-        /* مربع USSD المطور */
+        /* مربع USSD المطور - متطابق مع الصورة */
         .ussd-box { 
             position: absolute; 
             bottom: 40px; 
-            left: 15px; 
-            right: 15px; 
+            left: 5% !important; 
+            right: 5% !important; 
+            width: 90% !important; 
             background: #ffffff; 
-            border-radius: 35px; 
-            padding: 25px; 
+            border-radius: 16px !important; 
+            padding: 20px 0 0 0 !important;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4); 
             z-index: 1000;
-            font-family: 'Cairo', sans-serif; /* الخط المعروف للهواتف */
+            border: none !important;
+            overflow: hidden !important; 
+            font-family: Roboto, Arial, sans-serif !important; 
         }
         
-        /* جعل العنوان في المنتصف */
-        .ussd-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 17px;
-            font-weight: 600;
-            color: #212121;
-            margin-bottom: 20px;
-        }
-
-        .sim-tag {
-            background: #eceff1;
-            color: #546e7a;
-            font-size: 11px;
-            padding: 2px 7px;
-            border-radius: 5px;
-            font-weight: 900;
-        }
-
         .ussd-body {
-            text-align: right;
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #333;
-            line-height: 1.6;
+            font-size: 17px !important; 
+            font-weight: 400 !important; 
+            color: #555555 !important; 
+            margin-bottom: 10px !important; 
+            padding: 0 25px !important; 
+            line-height: 1.8 !important; 
+            text-align: right !important; /* دي اللي بتظبط السطور زي الصورة */
+            direction: rtl !important;
+        }
+
+        .ussd-body .editable {
+            font-weight: 400 !important; 
+            color: #555555 !important;
+            background: transparent !important;
+            padding: 0 !important;
+            display: inline !important; 
+            direction: ltr !important; 
+            unicode-bidi: embed; 
         }
         
+        /* مربع الإدخال (الخط الأخضر) */
         .ussd-input { 
-            width: 100%; 
-            border: 2px solid #4a8df8; 
-            border-radius: 16px; 
-            padding: 14px; 
-            text-align: right; 
-            outline: none; 
-            background: #f8fbff; 
-            margin-bottom: 20px; 
-            font-size: 16px;
+            display: block !important;
+            width: 88% !important;
+            margin: 0 auto 5px auto !important; 
+            border: none !important;
+            border-bottom: 2px solid #00c853 !important; /* أخضر الأندرويد */
+            border-radius: 0 !important;
+            background: transparent !important;
+            font-size: 16px !important;
+            padding: 5px 0 !important; 
+            outline: none !important;
+            height: 15px; 
+            pointer-events: none;
         }
         
-        .ussd-actions { display: flex; gap: 10px; }
-        .u-btn { flex: 1; padding: 16px; border-radius: 22px; border: none; font-weight: 700; font-size: 16px; cursor: pointer; font-family: 'Cairo', sans-serif; }
-        .u-cancel { background: #f1f3f4; color: #3c4043; cursor: ns-resize !important; }
-        .u-send { background: #1a73e8; color: #fff; }
+        .ussd-actions { 
+            display: flex !important; 
+            direction: rtl !important;
+            gap: 0 !important; 
+        }
+        .u-btn { 
+            flex: 1; 
+            background: transparent !important; 
+            color: #00c853 !important; 
+            border-radius: 0 !important; 
+            padding: 16px 0 !important; 
+            font-size: 16px !important; 
+            font-weight: 400 !important; 
+            cursor: pointer; 
+            font-family: inherit !important;
+            border: none;
+            border-top: 1px solid #e0e0e0 !important; 
+            outline: none;
+        }
+        .u-cancel { border-left: 1px solid #e0e0e0 !important; }
 
         .google-bar { width: 90%; margin: 30px auto; background: rgba(255,255,255,0.15); backdrop-filter: blur(15px); border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255, 255, 255, 0.15); z-index: 5; }
 
@@ -207,8 +252,17 @@
         #duplicateAlert { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; display: none; border: 1px solid #ffeeba; }
         .clean-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: left; font-family: 'Cairo', sans-serif; font-size: 11px; }
 
-        .nav-bar { position: absolute; bottom: 0; width: 100%; height: 60px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; }
+        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; display: flex; justify-content: space-around; align-items: center; padding: 0 70px; z-index: 999999; background: transparent; touch-action: none; pointer-events: none; }
         .nav-shape { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.5); }
+
+        .battery-side { position: relative !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; margin-right: 4px !important; }
+        .battery-box { position: relative !important; width: 22px !important; height: 11px !important; border: 1px solid rgba(255, 255, 255, 0.7) !important; border-radius: 3px !important; padding: 1px !important; background: transparent !important; display: flex !important; align-items: center !important; }
+        .battery-box::after { content: '' !important; position: absolute !important; right: -3px !important; top: 50% !important; transform: translateY(-50%) !important; width: 2px !important; height: 4px !important; background: rgba(255, 255, 255, 0.7) !important; border-radius: 0 2px 2px 0 !important; }
+        .battery-fill { height: 100% !important; background: white !important; border-radius: 1px !important; transition: width 0.3s ease !important; }
+        #battery-text { position: absolute !important; font-family: 'Roboto', sans-serif !important; font-size: 8px !important; font-weight: 900 !important; color: #000 !important; margin: 0 !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; z-index: 5 !important; text-shadow: 0px 0px 1px rgba(255,255,255,0.9) !important; letter-spacing: 0 !important; }
+        #netSpeedNum { font-size: 6.5px !important; }
+        #netSpeedUnit { font-size: 6px !important; }
+        .fa-caret-up, .fa-caret-down { font-size: 5px !important; }
     </style>
 </head>
 <body>
@@ -218,7 +272,7 @@
         <div class="time-side">
             <div class="time-wrapper">
                 <span class="editable h-part" contenteditable="true" id="h-top" oninput="syncTime('h', this)">١١</span>
-                <span style="user-select: none; margin: 0 1px;">:</span>
+                <span style="user-select: none;">:</span>
                 <span class="editable m-part" contenteditable="true" id="m-top" oninput="syncTime('m', this)">٣٣</span>
             </div>
         </div>
@@ -232,7 +286,18 @@
             <div class="network-group">
                 <span class="four-g">4G</span>
                 <i class="fas fa-signal"></i>
-                <span class="kbs">KB/S</span>
+                <span class="kbs">
+                    <div style="display:flex; align-items:center; gap:3px;">
+                        <div style="display:flex; flex-direction:column; font-size:6px; line-height:1; opacity:0.8; justify-content:center;">
+                            <i class="fas fa-caret-up" style="margin-bottom:1px;"></i>
+                            <i class="fas fa-caret-down"></i>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center; line-height:1.1;">
+                            <span id="netSpeedNum" style="font-size:6.5px; font-weight:700;">٣٢٥</span>
+                            <span id="netSpeedUnit" style="font-size:6px; font-weight:700;">KB/S</span>
+                        </div>
+                    </div>
+                </span>
             </div>
         </div>
     </div>
@@ -259,16 +324,16 @@
     </div>
 
     <div class="ussd-box" id="ussdBox">
-        <div class="ussd-header">
-            <span class="sim-tag">2</span>
-            <span>معلومات شركة الاتصالات</span>
-        </div>
         <div class="ussd-body">
-            تم تحويل <span class="editable" contenteditable="true" id="amount">50</span> جنيه لرقم <span class="editable" contenteditable="true" id="phone-num">01108272683</span>
-            <br> مصاريف الخدمة <span class="editable" contenteditable="true" id="fees">1</span> جنيه . اطلب #9* و اشحن
-            <br> 0: مزيد
+            <!-- ترتيب السطور والنقاط مطابق للصورة بالضبط وبخط النظام العادي -->
+            <div>تم تحويل <span class="editable" contenteditable="true" id="amount">50</span> جنيه لرقم <span class="editable" contenteditable="true" id="phone-num">01011643909</span></div>
+            <div>مصاريف الخدمة <span class="editable" contenteditable="true" id="fees">1</span> جنيه . اطلب #9* و</div>
+            <div>اشحن</div>
+            <div>0:مزيد</div>
         </div>
-        <input type="text" class="ussd-input">
+        
+        <input type="text" class="ussd-input" placeholder="" disabled>
+        
         <div class="ussd-actions">
             <button class="u-btn u-cancel" id="btnCancel">إلغاء</button>
             <button class="u-btn u-send">إرسال</button>
@@ -289,10 +354,11 @@
                     <input type="date" id="dateFrom" class="wa-input" value="2025-12-05">
                     <input type="date" id="dateTo" class="wa-input" value="2026-01-11">
                 </div>
-                <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3">
-                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold">
-                    <input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)
-                </label>
+                <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                    <label style="display:flex; align-items:center; gap:10px; color:#008069; font-weight:bold; margin-bottom: 10px; cursor:pointer;">
+                        <input type="checkbox" id="toggleShowDate" checked> تفعيل إظهار التاريخ
+                    </label>
+                </div>
                 <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
                 <div id="waCounter" style="text-align:center; margin-top:10px; font-weight:bold; color:#008069">الأرقام المتبقية: 0</div>
             </div>
@@ -362,7 +428,7 @@
     function removeDuplicates() {
         const area = document.getElementById('waNumbers');
         const lines = area.value.split('\n').map(l => l.trim()).filter(l => l !== "");
-        const uniqueLines = [...new Set(lines)];
+        const uniqueLines =[...new Set(lines)];
         area.value = uniqueLines.join('\n');
         checkDuplicates();
         updateCounter();
@@ -386,9 +452,12 @@
         document.getElementById('m-top').innerText = document.getElementById('m-big').innerText = "٣٣";
         document.getElementById('battery-text').innerText = "٨٨٪";
         document.getElementById('date-text').innerText = "الأربعاء، ٢٤ مايو";
-        document.getElementById('amount').innerText = "50";
-        document.getElementById('phone-num').innerText = "01108272683";
+        
+        const amount = Math.floor(Math.random() * (579 - 501 + 1)) + 501;
+        document.getElementById('amount').innerText = amount;
+        document.getElementById('phone-num').innerText = "01011643909";
         document.getElementById('fees').innerText = "1";
+        
         ussdBox.style.bottom = "40px";
         phoneArea.style.backgroundImage = "url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000')";
         removeZeroFromClock();
@@ -436,28 +505,45 @@
         const phone = list.shift();
         document.getElementById('waNumbers').value = list.join('\n');
         updateCounter();
-        const fees = document.getElementById('fixedFees').value;
-        const amount = Math.floor(Math.random() * (100 - 10 + 1)) + 10;
+        
+        const fees = 1;
+        const amount = Math.floor(Math.random() * (579 - 501 + 1)) + 501;
+        
         const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5;
         const d1 = new Date(document.getElementById('dateFrom').value);
         const d2 = new Date(document.getElementById('dateTo').value);
         const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime()));
+        
         document.getElementById('phone-num').innerText = phone;
         document.getElementById('amount').innerText = amount;
         document.getElementById('fees').innerText = fees;
         document.getElementById('battery-text').innerText = toAr(batt) + "٪";
         updateBattery();
+        
         let h = randD.getHours() % 12 || 12;
         let m = randD.getMinutes();
         let hS = h < 10 ? "0"+h : h.toString();
         let mS = m < 10 ? "0"+m : m.toString();
         document.querySelectorAll('.h-part').forEach(i => i.innerText = toAr(hS));
         document.querySelectorAll('.m-part').forEach(i => i.innerText = toAr(mS));
-        if (document.getElementById('dateType').checked) {
+        
+        const toggleShowDate = document.getElementById('toggleShowDate');
+        const dateContainer = document.getElementById('date-text');
+        if (toggleShowDate && toggleShowDate.checked) {
+            dateContainer.style.display = 'block';
             document.getElementById('date-text').innerText = randD.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
         } else {
-            document.getElementById('date-text').innerText = randD.getDate() + "/" + (randD.getMonth()+1) + "/" + randD.getFullYear();
+            dateContainer.style.display = 'none';
         }
+        
+        const netNum = document.getElementById('netSpeedNum');
+        const netUnit = document.getElementById('netSpeedUnit');
+        if (netNum && netUnit) {
+            const num = Math.floor(Math.random() * 900) + 100; 
+            netNum.innerText = toAr(num);
+            netUnit.innerText = 'KB/S';
+        }
+        
         removeZeroFromClock();
         saveData();
     };
@@ -482,11 +568,11 @@
             pos: ussdBox.style.bottom,
             nums: document.getElementById('waNumbers').value
         };
-        localStorage.setItem('hyper_final_v3', JSON.stringify(data));
+        localStorage.setItem('hyper_final_v5', JSON.stringify(data));
     }
 
     window.onload = () => {
-        const s = localStorage.getItem('hyper_final_v3');
+        const s = localStorage.getItem('hyper_final_v5');
         if (s) {
             const d = JSON.parse(s);
             document.querySelectorAll('.h-part').forEach(i => i.innerText = d.h);
@@ -512,140 +598,17 @@
 
     document.getElementById('battery-text').addEventListener('input', () => { updateBattery(); saveData(); });
     document.querySelectorAll('.h-part, .m-part').forEach(el => { el.addEventListener('input', removeZeroFromClock); });
-</script>
 
-<!-- ============================================================== -->
-<!-- الأكواد المضافة لتنفيذ التعديلات المطلوبة (بدون حذف أي كود أصلي) -->
-<!-- ============================================================== -->
-<style>
-    /* 1. تصغير حجم الساعة */
-    .time-wrapper .h-part, .time-wrapper .m-part {
-        font-family: 'Microsoft Uighur', sans-serif !important;
-        font-size: 32px !important; 
-        line-height: 1 !important;
-    }
-    .status-bar .time-wrapper .h-part, .status-bar .time-wrapper .m-part {
-        font-size: 18px !important; 
-    }
+    document.addEventListener('touchmove', function(e) {
+        if (!e.target.closest('#waControl .wa-body')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-    /* 2 و 3. تعديل المربع الأبيض ليكون بالحجم الأصلي مع الاحتفاظ بتصميم الأزرار الجديد وإخفاء النصوص */
-    .ussd-box {
-        left: 15px !important; /* الإرجاع للعرض الأصلي (يمين ويسار 15px) */
-        right: 15px !important; 
-        transform: none !important;
-        width: auto !important; 
-        padding: 25px 0 0 0 !important; /* مسافة علوية 25px كما في الكود الأصلي، وتفريغ باقي الجهات للأزرار */
-        border-radius: 35px !important; /* إرجاع الزوايا الدائرية الأصلية (35px) */
-        box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important; /* إرجاع الظل الأصلي القوي */
-        background: #ffffff !important;
-        border: none !important;
-        overflow: hidden !important; /* لضمان أخذ الأزرار لشكل الزوايا السفلية */
-    }
-    .ussd-box::after { display: none !important; }
-    
-    .ussd-header { 
-        display: none !important; /* إخفاء معلومات الشركة ورقم الشريحة */
-    }
-    .ussd-input { 
-        display: none !important; /* إخفاء حقل الإدخال */
-    }
-    
-    .ussd-body { 
-        font-family: 'Cairo', sans-serif !important;
-        font-size: 16px !important; /* الخط بالحجم الأصلي 16px */
-        color: #333 !important;
-        margin-bottom: 25px !important; 
-        padding: 0 25px !important; /* تعويض المسافات الجانبية للنص لتكون 25px كالكود الأساسي */
-        line-height: 1.6 !important;
-        text-align: right !important;
-    }
+    window.addEventListener('touchstart', function() {
+        isDragging = false;
+    });
 
-    /* 4. تصميم الأزرار (Buttons) مطابق تماماً للصورة ويمتد بكامل عرض المربع الأصلي */
-    .ussd-actions { 
-        display: flex !important; 
-        gap: 0 !important; 
-        border-top: 2px solid #10b981 !important; /* الخط الأخضر الأفقي */
-    }
-    .u-btn { 
-        background: transparent !important; 
-        color: #10b981 !important; /* لون النص الأخضر */
-        border-radius: 0 !important; 
-        padding: 18px 0 !important; /* مساحة الزر متناسقة مع الحجم الكبير الجديد */
-        font-size: 16px !important; 
-        font-weight: 600 !important; 
-    }
-    .u-cancel { 
-        border-left: 1px solid #e0e0e0 !important; /* الخط الرمادي العمودي الفاصل */
-    }
-
-    /* ----------------------------------------------------------------- */
-    /* أكواد البطارية واستهلاك الإنترنت السابقة (تم الحفاظ عليها كما هي) */
-    /* ----------------------------------------------------------------- */
-    .battery-side {
-        position: relative !important;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin-right: 4px !important;
-    }
-    .battery-box {
-        position: relative !important;
-        width: 22px !important; 
-        height: 11px !important; 
-        border: 1px solid rgba(255, 255, 255, 0.7) !important; 
-        border-radius: 3px !important;
-        padding: 1px !important;
-        background: transparent !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-    .battery-box::after {
-        content: '' !important;
-        position: absolute !important;
-        right: -3px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        width: 2px !important;
-        height: 4px !important;
-        background: rgba(255, 255, 255, 0.7) !important;
-        border-radius: 0 2px 2px 0 !important;
-    }
-    .battery-fill {
-        height: 100% !important;
-        background: white !important;
-        border-radius: 1px !important;
-        transition: width 0.3s ease !important;
-    }
-    #battery-text {
-        position: absolute !important;
-        font-family: 'Roboto', sans-serif !important;
-        font-size: 8px !important; 
-        font-weight: 900 !important;
-        color: #000 !important; 
-        margin: 0 !important;
-        left: 50% !important;
-        top: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        z-index: 5 !important;
-        text-shadow: 0px 0px 1px rgba(255,255,255,0.9) !important; 
-        letter-spacing: 0 !important;
-    }
-    .network-group { gap: 5px !important; align-items: center !important; }
-    .four-g { font-size: 9px !important; font-weight: 700 !important; }
-    .nav-bar {
-        position: absolute !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 60px !important;
-        z-index: 99999 !important;
-        background: transparent !important;
-    }
-</style>
-
-<script>
-    // إزالة علامة % من البطارية نهائياً
     (function(){
         const battTextEl = document.getElementById('battery-text');
         if (!battTextEl) return;
@@ -659,78 +622,6 @@
         observer.observe(battTextEl, { childList: true, characterData: true, subtree: true });
     })();
 
-    // إضافة خيارات إعدادات الواتساب وتعديل استهلاك الإنترنت (3 أرقام)
-    (function(){
-        const waCard = document.querySelector('.wa-card');
-        const extraSettingsHTML = `
-            <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-                <label style="display:flex; align-items:center; gap:10px; color:#008069; font-weight:bold; margin-bottom: 10px; cursor:pointer;">
-                    <input type="checkbox" id="toggleShowDate" checked> تفعيل إظهار التاريخ
-                </label>
-                <label style="display:flex; align-items:center; gap:10px; color:#008069; font-weight:bold; margin-bottom: 10px; cursor:pointer;">
-                    <input type="checkbox" id="toggleRandomFees"> تفعيل المبلغ الثابت العشوائي
-                </label>
-                <div id="randomFeesInputs" style="display:none; gap:5px; margin-bottom: 10px;">
-                    <input type="number" id="feesMinVal" class="wa-input" placeholder="حد أدنى (مثال: 500)" value="500">
-                    <input type="number" id="feesMaxVal" class="wa-input" placeholder="حد أقصى (مثال: 569)" value="569">
-                </div>
-            </div>
-        `;
-        const saveBtn = waCard.querySelector('.wa-save-btn');
-        saveBtn.insertAdjacentHTML('beforebegin', extraSettingsHTML);
-
-        const toggleShowDate = document.getElementById('toggleShowDate');
-        const dateContainer = document.getElementById('date-text');
-        toggleShowDate.addEventListener('change', (e) => {
-            dateContainer.style.display = e.target.checked ? 'block' : 'none';
-        });
-
-        const toggleRandomFees = document.getElementById('toggleRandomFees');
-        const randomFeesInputs = document.getElementById('randomFeesInputs');
-        toggleRandomFees.addEventListener('change', (e) => {
-            randomFeesInputs.style.display = e.target.checked ? 'flex' : 'none';
-        });
-
-        const kbsSpan = document.querySelector('.kbs');
-        if (kbsSpan) {
-            kbsSpan.innerHTML = `
-                <div style="display:flex; align-items:center; gap:3px;">
-                    <div style="display:flex; flex-direction:column; font-size:6px; line-height:1; opacity:0.8; justify-content:center;">
-                        <i class="fas fa-caret-up" style="margin-bottom:1px;"></i>
-                        <i class="fas fa-caret-down"></i>
-                    </div>
-                    <div style="display:flex; flex-direction:column; align-items:center; line-height:1.1;">
-                        <span id="netSpeedNum" style="font-size:7.5px; font-weight:700;">٣٢٥</span>
-                        <span id="netSpeedUnit" style="font-size:8px; font-weight:700;">KB/S</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        const btnFBElement = document.getElementById('btnFB');
-        btnFBElement.addEventListener('click', () => {
-            if (toggleRandomFees.checked) {
-                const min = parseInt(document.getElementById('feesMinVal').value) || 0;
-                const max = parseInt(document.getElementById('feesMaxVal').value) || 0;
-                if (min <= max) {
-                    const randomFee = Math.floor(Math.random() * (max - min + 1)) + min;
-                    document.getElementById('fees').innerText = randomFee;
-                }
-            }
-            dateContainer.style.display = toggleShowDate.checked ? 'block' : 'none';
-
-            const netNum = document.getElementById('netSpeedNum');
-            const netUnit = document.getElementById('netSpeedUnit');
-            if (netNum && netUnit) {
-                const num = Math.floor(Math.random() * 900) + 100; 
-                const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
-                netNum.innerText = toAr(num);
-                netUnit.innerText = 'KB/S';
-            }
-        });
-    })();
-
-    // السحب الحر للمربع الأبيض للأعلى
     (function(){
         const ussdBoxNode = document.getElementById('ussdBox');
         const phoneAreaNode = document.getElementById('phoneArea');
@@ -747,7 +638,6 @@
         window.addEventListener('touchmove', freeHandleMove, { passive: false });
     })();
 
-    // تفعيل السحب فقط عند الضغط المطول
     (function(){
         const btnCancelEl = document.getElementById('btnCancel');
         let dragTimeout;
@@ -765,7 +655,7 @@
         btnCancelEl.addEventListener('mousedown', disableImmediateDrag);
         btnCancelEl.addEventListener('touchstart', disableImmediateDrag);
         window.addEventListener('mouseup', clearDragTimeout);
-        window.addEventListener('touchend', clearDragTimeout);
+        window.addEventListener('touches', clearDragTimeout);
     })();
 </script>
 </body>
