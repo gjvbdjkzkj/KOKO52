@@ -45,7 +45,7 @@
             border: none;
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
             transition: background-image 0.8s ease-in-out;
-            padding-bottom: 70px; /* مساحة للأزرار السفلية */
+            padding-bottom: 0;
         }
 
         .phone-content {
@@ -150,7 +150,7 @@
         .icon-box { width: 62px; height: 62px; border-radius: var(--miui-radius); margin-bottom: 8px; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .app-name { color: white; font-size: 12px; text-align: center; font-weight: 600; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 
-        /* صندوق USSD من الكود الثاني (مع تعديل الواو) */
+        /* صندوق USSD من الكود الثاني (بدون تنسيق خاص للواو) */
         .ussd-box { 
             position: absolute; 
             bottom: 40px; 
@@ -227,41 +227,6 @@
         }
         .u-cancel { border-left: 1px solid #e0e0e0 !important; }
 
-        /* الأزرار الثلاثة في الأسفل */
-        .bottom-buttons {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 65px;
-            background: transparent;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 30px;
-            z-index: 2000;
-            backdrop-filter: blur(5px);
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-        .bottom-btn {
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.2);
-            border-radius: 30px;
-            color: white;
-            font-size: 22px;
-            cursor: default;
-            transition: 0.2s;
-        }
-        /* شكل الأزرار (أيقونات) */
-        .bottom-btn i {
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        }
-
         /* إعدادات واتساب */
         #waControl {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 5000; 
@@ -337,7 +302,7 @@
         }
         .random-range input { width: 50%; }
 
-        /* شريط السحب السفلي (اختياري) */
+        /* شريط السحب السفلي (اختياري، لا أزرار) */
         .nav-drag-handle {
             width: 40px;
             height: 4px;
@@ -349,17 +314,13 @@
         }
         .nav-bar-container {
             position: absolute;
-            bottom: 65px; /* فوق الأزرار الثلاثة */
+            bottom: 10px;
             width: 100%;
             padding-bottom: calc(8px + env(safe-area-inset-bottom));
             display: flex;
             justify-content: center;
             z-index: 2000;
             pointer-events: none;
-        }
-        /* منع تداخل الأزرار مع المحتوى القابل للسحب */
-        .ussd-box {
-            bottom: 85px; /* تعديل الوضع الابتدائي ليكون فوق الأزرار */
         }
     </style>
 </head>
@@ -412,12 +373,12 @@
         </div>
     </div>
 
-    <!-- صندوق USSD من الكود الثاني مع تصغير حرف الواو -->
-    <div class="ussd-box" id="ussdBox">
+    <!-- صندوق USSD - الواو بدون تنسيق خاص (يرث الخط العام) -->
+   <div class="ussd-box" id="ussdBox">
         <div class="ussd-body">
             <div>تم تحويل <span class="editable" contenteditable="true" id="amount" oninput="saveAllData()">50</span> جنيه لرقم <span class="editable" contenteditable="true" id="phone-num" oninput="saveAllData()">01011643909</span></div>
-            <div>مصاريف الخدمة <span class="editable" contenteditable="true" id="fees" oninput="saveAllData()">1</span> جنيه . اطلب #9* <span style="font-size:0.8em; display:inline-block;">و</span></div>
-            <div>اشحن</div>
+            <div>مصاريف الخدمة <span class="editable" contenteditable="true" id="fees" oninput="saveAllData()">1</span> جنيه . اطلب #9*</div>
+            <div>و اشحن</div>
             <div>0:مزيد</div>
         </div>
         
@@ -429,14 +390,7 @@
         </div>
     </div>
 
-    <!-- الأزرار الثلاثة في الأسفل -->
-    <div class="bottom-buttons">
-        <div class="bottom-btn"><i class="fas fa-chevron-right"></i></div>
-        <div class="bottom-btn"><i class="far fa-circle"></i></div>
-        <div class="bottom-btn"><i class="far fa-square"></i></div>
-    </div>
-
-    <!-- لوحة إعدادات واتساب (تم إزالة المفكر) -->
+    <!-- لوحة إعدادات واتساب -->
     <div id="waControl">
         <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات المتطورة</div>
         <div class="wa-body">
@@ -524,7 +478,7 @@
     function updateBatteryUI(val) { val = Math.min(Math.max(val,0),100); batLevel.style.width = val+'%'; batText.innerText = val; batText.style.color = val>50?'black':(val<20?'red':'white'); }
     batText.addEventListener('input',()=>{ let v=parseInt(batText.innerText); if(!isNaN(v)) updateBatteryUI(v); saveAllData(); });
 
-    // USSD dragging (مع تعديل الحد الأدنى للوضع ليتناسب مع الأزرار)
+    // USSD dragging
     const ussdBox = document.getElementById('ussdBox');
     const btnCancel = document.getElementById('btnCancel');
     const btnSend = document.getElementById('btnSend');
@@ -551,8 +505,7 @@
         let clientY = e.touches ? e.touches[0].clientY : e.clientY;
         let phoneRect = document.getElementById('phoneFrame').getBoundingClientRect();
         let newBottom = phoneRect.bottom - clientY - 30;
-        // الحد الأدنى ليكون فوق الأزرار مباشرة
-        if (newBottom < 85) newBottom = 85;
+        if (newBottom < 20) newBottom = 20;
         if (newBottom > phoneRect.height - ussdBox.offsetHeight + 10) newBottom = phoneRect.height - ussdBox.offsetHeight + 10;
         ussdBox.style.bottom = newBottom + 'px';
     }
@@ -774,7 +727,7 @@
             document.getElementById('phone-num').innerText = d.phone || '01036543568';
             document.getElementById('fees').innerText = d.fees || '3';
             document.getElementById('ussdMsgInput').value = d.ussdMsg || '';
-            ussdBox.style.bottom = d.pos || '85px';
+            ussdBox.style.bottom = d.pos || '40px';
             list = d.list || [];
             fixedFees = d.fixedFees || 3;
             fixedTransfer = d.fixedTransfer || 200;
