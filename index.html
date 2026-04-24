@@ -20,13 +20,17 @@
             --system-font: 'Cairo', sans-serif;
             --clock-font: 'Microsoft Uighur', 'Tahoma', 'Noto Naskh Arabic', sans-serif;
             --miui-radius: 22px;
-            --phone-width: 100%; 
-            --phone-height: 100vh; 
+            --phone-width: 100%;
+            --phone-height: 100vh;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--system-font); outline: none; }
         body { background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        .phone-frame { width: var(--phone-width); height: var(--phone-height); max-width: 500px; background: var(--bg-ui) center/cover; position: relative; overflow: hidden; border: none; box-shadow: 0 0 30px rgba(0,0,0,0.5); transition: background-image 0.3s; padding-bottom: 0; }
-        .phone-content { height: 100%; overflow-y: auto; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .phone-frame { width: var(--phone-width); height: var(--phone-height); max-width: 500px; position: relative; overflow: hidden; border: none; box-shadow: 0 0 30px rgba(0,0,0,0.5); background-color: #000; }
+
+        #bgLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: var(--bg-ui) center/cover no-repeat; pointer-events: none; will-change: transform; }
+        #dimOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 997; background: rgba(0,0,0,0.18); pointer-events: none; display: block; }
+
+        .phone-content { height: 100%; overflow-y: auto; padding-bottom: 20px; -webkit-overflow-scrolling: touch; position: relative; z-index: 1; }
         .phone-content::-webkit-scrollbar { display: none; }
         .status-bar { height: 44px; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 2000; position: relative; margin-top: env(safe-area-inset-top); }
         .status-left { display: flex; align-items: baseline; }
@@ -36,11 +40,11 @@
         .signal-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: center; line-height: 1; }
         .network-type { font-size: 8px; font-weight: 900; position: absolute; top: -4px; left: 0; transform: translateX(-50%); letter-spacing: -0.2px; }
         .signal-icon { font-size: 11px; }
-        .battery-container { position: relative; width: 28px; height: 13px; border: 1.2px solid rgba(255, 255, 255, 0.8); border-radius: 3.5px; display: flex; align-items: center; justify-content: center; padding: 1px; }
-        .battery-container::after { content: ''; position: absolute; right: -3.5px; top: 3.5px; width: 2.5px; height: 4.5px; background: rgba(255, 255, 255, 0.8); border-radius: 0 1.5px 1.5px 0; }
+        .battery-container { position: relative; width: 28px; height: 13px; border: 1.2px solid rgba(255,255,255,0.8); border-radius: 3.5px; display: flex; align-items: center; justify-content: center; padding: 1px; }
+        .battery-container::after { content: ''; position: absolute; right: -3.5px; top: 3.5px; width: 2.5px; height: 4.5px; background: rgba(255,255,255,0.8); border-radius: 0 1.5px 1.5px 0; }
         .battery-level { position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; background: #fff; border-radius: 1.5px; z-index: 1; }
         .battery-percentage { position: relative; z-index: 2; font-size: 8.5px; font-weight: 900; color: #000; line-height: 1; transform: scale(0.9); }
-        .google-widget { margin: 20px 20px 10px 20px; background: rgba(255, 255, 255, 0.95); height: 48px; border-radius: 24px; display: flex; align-items: center; padding: 0 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .google-widget { margin: 20px 20px 10px 20px; background: rgba(255,255,255,0.95); height: 48px; border-radius: 24px; display: flex; align-items: center; padding: 0 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .google-logo { width: 20px; margin-left: 12px; }
         .google-search-text { flex: 1; color: #70757a; font-size: 15px; text-align: right; }
         .google-icons { display: flex; gap: 12px; color: #5f6368; font-size: 18px; }
@@ -80,31 +84,179 @@
         input:checked + .slider:before { transform: translateX(-24px); }
         .random-range { display: flex; gap: 10px; margin-top: 10px; }
         .random-range input { width: 50%; }
-        .nav-drag-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 10px; margin: 0 auto 8px auto; cursor: grab; opacity: 0.6; }
-        .nav-bar-container { position: absolute; bottom: 10px; width: 100%; padding-bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; justify-content: center; z-index: 2000; pointer-events: none; }
-        
-        /* أنماط المعرض وأزرار التعديل */
+
+        /* شريط التنقل السفلي - أيقونات متناسقة */
+        .main-nav-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 46px;
+            background-color: transparent;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .main-nav-container .nav-item {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: none;
+        }
+        .main-nav-container svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+        }
+
+        /* معرض الصور - إطارات منفصلة وزر حذف الكل */
         .gallery-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .gallery-container { width: 95%; max-width: 500px; height: 85%; background: white; border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; direction: rtl; }
         .gallery-header { padding: 12px; background: #f5f5f5; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; gap: 8px; }
         .gallery-header h3 { margin: 0; font-size: 16px; }
         .close-gallery { background: none; border: none; font-size: 28px; cursor: pointer; }
+        .gallery-actions { display: flex; gap: 8px; align-items: center; }
         .gallery-add-btn { background: #008069; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; }
-        .gallery-grid { flex: 1; overflow-y: auto; padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .gallery-item { position: relative; aspect-ratio: 9/16; border-radius: 12px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: #eee; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-delete-all-btn { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; }
+        .gallery-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            align-content: start;
+        }
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 9/16;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: border 0.2s;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .gallery-item.active { border-color: #008069; }
-        .item-buttons { position: absolute; bottom: 5px; left: 5px; right: 5px; display: flex; justify-content: space-between; gap: 5px; }
-        .item-buttons div { background: rgba(0,0,0,0.7); color: white; border-radius: 20px; padding: 4px 8px; font-size: 12px; cursor: pointer; text-align: center; flex: 1; }
-        .edit-bar { background: #222; padding: 10px; display: flex; justify-content: center; gap: 15px; border-top: 1px solid #444; direction: ltr; }
-        .edit-bar button { background: #333; border: none; color: white; font-size: 24px; width: 50px; height: 50px; border-radius: 30px; cursor: pointer; touch-action: manipulation; }
-        .edit-bar button:active { background: #008069; }
-        .edit-bar .zoom-val { color: white; font-size: 18px; background: #000; padding: 0 12px; border-radius: 30px; display: flex; align-items: center; }
-        @media (max-width: 500px) { .edit-bar button { width: 45px; height: 45px; font-size: 20px; } }
+        .gallery-item .delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            pointer-events: auto;
+        }
+
+        /* ===== أنماط ميزة تغيير الأيقونات (تيك توك) ===== */
+        #tiktokSettings {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f0f2f5;
+            z-index: 5001; /* أعلى من waControl */
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .tiktok-header {
+            background: #000000;
+            color: white;
+            padding: 45px 20px 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tiktok-body {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .tiktok-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .tiktok-card .app-preview {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .tiktok-card .app-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .tiktok-card .app-info {
+            flex: 1;
+            min-width: 120px;
+        }
+        .tiktok-card .app-info input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 4px;
+        }
+        .tiktok-card .file-upload-btn {
+            background: #e0e0e0;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .tiktok-reset-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 <div class="phone-frame" id="phoneFrame">
+    <div id="bgLayer"></div>
+    <div id="dimOverlay"></div>
+
     <div class="status-bar">
         <div class="status-left"><div class="editable-time" id="clockTime" contenteditable="true">١٢:٥٩</div></div>
         <div class="status-right">
@@ -121,45 +273,94 @@
             <div class="app-item" id="fbAppBtn"><div class="icon-box" style="background: #1877F2;"><i class="fab fa-facebook" style="color:white"></i></div><div class="app-name">فيسبوك</div></div>
             <div class="app-item" id="telegramBtn"><div class="icon-box" style="background: #0088cc;"><i class="fab fa-telegram" style="color:white"></i></div><div class="app-name">تيليجرام</div></div>
             <div class="app-item" id="youtubeApp"><div class="icon-box" style="background: #f00;"><i class="fab fa-youtube" style="color:white"></i></div><div class="app-name">يوتيوب</div></div>
-            <div class="app-item"><div class="icon-box" style="background: #fff;"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="35"></div><div class="app-name">جوجل</div></div>
+            <div class="app-item"><div class="icon-box" style="background: #fff;"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="35" alt="Google"></div><div class="app-name">جوجل</div></div>
             <div class="app-item"><div class="icon-box" style="background: #000;"><i class="fab fa-tiktok" style="color:white"></i></div><div class="app-name">تيك توك</div></div>
             <div class="app-item" id="instagramBtn"><div class="icon-box" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="fab fa-instagram" style="color:white"></i></div><div class="app-name">إنستجرام</div></div>
             <div class="app-item" id="phoneBtn"><div class="icon-box" style="background: #4caf50;"><i class="fas fa-phone" style="color:white"></i></div><div class="app-name">الهاتف</div></div>
         </div>
     </div>
+
+    <!-- شريط التنقل - الأيقونات الثلاثة متساوية السمك والحجم -->
+    <div class="main-nav-container">
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24">
+                <path d="M16 6l-7 7 7 7" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2.5" fill="none"/></svg>
+        </div>
+        <div class="nav-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="white" stroke-width="2.5" fill="none"/></svg>
+        </div>
+    </div>
+
     <div class="ussd-box" id="ussdBox">
         <div class="ussd-body"><div>تم تحويل <span class="editable" contenteditable="true" id="amount" oninput="saveAllData()">50</span> جنيه لرقم <span class="editable" contenteditable="true" id="phone-num" oninput="saveAllData()">01011643909</span></div><div>مصاريف الخدمة <span class="editable" contenteditable="true" id="fees" oninput="saveAllData()">1</span> جنيه . اطلب #9*</div><div>و اشحن</div><div>0:مزيد</div></div>
         <input type="text" class="ussd-input" id="ussdMsgInput" placeholder="" oninput="saveAllData()">
         <div class="ussd-actions"><button class="u-btn u-cancel" id="btnCancel">إلغاء</button><button class="u-btn u-send" id="btnSend">إرسال</button></div>
     </div>
     <div id="waControl">
-        <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()"></i> الإعدادات المتطورة</div>
-        <div class="wa-body"><div class="wa-card"><label style="font-size:12px">الأرقام (رقم في كل سطر):</label><textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea><div id="duplicateAlert" class="duplicateAlert"><button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button><div id="duplicateText">يوجد أرقام مكررة!</div></div><div style="display:flex; gap:5px; margin-top:10px"><input type="date" id="dateFrom" class="wa-input" value="2025-12-05"><input type="date" id="dateTo" class="wa-input" value="2026-01-11"></div><div class="toggle-switch"><label>المبلغ العشوائي (تفعيل/إلغاء)</label><label class="switch"><input type="checkbox" id="randomAmountToggle"><span class="slider"></span></label></div><div id="fixedAmountDiv"><input type="number" id="fixedTransferAmount" class="wa-input" placeholder="المبلغ الثابت" value="200"></div><div id="randomAmountDiv" style="display:none;"><div class="random-range"><input type="number" id="minRandomAmount" class="wa-input" placeholder="الحد الأدنى" value="501"><input type="number" id="maxRandomAmount" class="wa-input" placeholder="الحد الأقصى" value="576"></div></div><label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="showDateUnderWeather" checked> عرض التاريخ تحت الطقس</label><input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3"><label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)</label><button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button><div id="waCounter" style="text-align:center; margin-top:10px;">الأرقام المتبقية: 0</div></div></div>
+        <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()" style="cursor:pointer;"></i> الإعدادات المتطورة</div>
+        <div class="wa-body">
+            <div class="wa-card">
+                <label style="font-size:12px">الأرقام (رقم في كل سطر):</label><textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
+                <div id="duplicateAlert" class="duplicateAlert"><button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button><div id="duplicateText">يوجد أرقام مكررة!</div></div>
+                <div style="display:flex; gap:5px; margin-top:10px"><input type="date" id="dateFrom" class="wa-input" value="2025-12-05"><input type="date" id="dateTo" class="wa-input" value="2026-01-11"></div>
+                <div class="toggle-switch"><label>المبلغ العشوائي (تفعيل/إلغاء)</label><label class="switch"><input type="checkbox" id="randomAmountToggle"><span class="slider"></span></label></div>
+                <div id="fixedAmountDiv"><input type="number" id="fixedTransferAmount" class="wa-input" placeholder="المبلغ الثابت" value="200"></div>
+                <div id="randomAmountDiv" style="display:none;"><div class="random-range"><input type="number" id="minRandomAmount" class="wa-input" placeholder="الحد الأدنى" value="501"><input type="number" id="maxRandomAmount" class="wa-input" placeholder="الحد الأقصى" value="576"></div></div>
+                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="showDateUnderWeather" checked> عرض التاريخ تحت الطقس</label>
+                <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3">
+                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)</label>
+
+                <div class="toggle-switch" style="margin-top:12px;">
+                    <label>تثبيت الوقت والتاريخ</label>
+                    <label class="switch"><input type="checkbox" id="customOverlayToggle"><span class="slider"></span></label>
+                </div>
+                <div id="customOverlayInputs" style="display:none; margin-top:8px;">
+                    <label style="font-size:12px; font-weight:bold;">الساعة الثابتة:</label>
+                    <input type="time" id="customTimeInput" class="wa-input" value="12:00">
+                    <label style="font-size:12px; font-weight:bold; margin-top:8px; display:block;">التاريخ الثابت:</label>
+                    <input type="date" id="customDateInput" class="wa-input" value="2026-01-01">
+                </div>
+
+                <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
+                <div id="waCounter" style="text-align:center; margin-top:10px;">الأرقام المتبقية: 0</div>
+            </div>
+        </div>
     </div>
-    <div class="nav-bar-container" id="navContainer"><div class="nav-drag-handle" id="navDragBtn"></div></div>
+
+    <!-- ===== نافذة إعدادات الأيقونات (تيك توك) ===== -->
+    <div id="tiktokSettings">
+        <div class="tiktok-header">
+            <i class="fas fa-arrow-right" onclick="closeTikTokSettings()" style="cursor:pointer;"></i> تخصيص الأيقونات
+        </div>
+        <div class="tiktok-body" id="tiktokBody">
+            <!-- سيتم بناء المحتوى ديناميكيًا عبر JavaScript -->
+        </div>
+    </div>
 </div>
 
-<!-- نافذة المعرض -->
+<!-- نافذة المعرض مع إطارات منفصلة وزر حذف الكل -->
 <div id="galleryModal" class="gallery-modal">
     <div class="gallery-container">
-        <div class="gallery-header"><h3>📸 معرض الخلفيات</h3><button class="close-gallery" id="closeGalleryBtn">&times;</button><button class="gallery-add-btn" id="addImageBtn">➕ إضافة صور</button><input type="file" id="fileInput" accept="image/*" style="display:none" multiple></div>
-        <div class="gallery-grid" id="galleryGrid"><div class="gallery-empty">لا توجد صور، أضف صوراً من جهازك</div></div>
-        <div id="editBar" class="edit-bar" style="display: none;">
-            <button id="moveUpEdit">⬆️</button>
-            <button id="moveLeftEdit">⬅️</button>
-            <button id="moveDownEdit">⬇️</button>
-            <button id="moveRightEdit">➡️</button>
-            <button id="zoomOutEdit">🔍-</button>
-            <span class="zoom-val" id="zoomPercentEdit">100%</span>
-            <button id="zoomInEdit">🔍+</button>
-            <button id="resetEditBtn">⟳</button>
-            <button id="applyEditBtn">💾</button>
+        <div class="gallery-header">
+            <h3>📸 معرض الخلفيات</h3>
+            <button class="close-gallery" id="closeGalleryBtn">&times;</button>
+            <div class="gallery-actions">
+                <button class="gallery-add-btn" id="addImageBtn">➕ إضافة</button>
+                <button class="gallery-delete-all-btn" id="deleteAllBtn">🗑️ حذف الكل</button>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" multiple>
+        </div>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="gallery-empty" style="grid-column:span 3;text-align:center;padding:20px;">لا توجد صور، أضف صوراً من جهازك</div>
         </div>
     </div>
 </div>
 
 <script>
-    // ================== دوال مساعدة ==================
     const toAr = (n) => n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
     const toEn = (str) => str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
     function removeZeroFromClock() {
@@ -175,7 +376,8 @@
         });
     }
 
-    // ================== متغيرات عامة ==================
+    const bgLayer = document.getElementById('bgLayer');
+    const phoneFrame = document.getElementById('phoneFrame');
     let list = [];
     let fixedFees = 3;
     let fixedTransfer = 200;
@@ -186,27 +388,28 @@
     let dateFrom = "2025-12-05";
     let dateTo = "2026-01-11";
     let dateTypeChecked = true;
+    let customOverlayEnabled = false;
+    let customTimeValue = "12:00";
+    let customDateValue = "2026-01-01";
 
-    // Battery
     const batText = document.getElementById('batText');
     const batLevel = document.getElementById('batLevel');
     function updateBatteryUI(val) { val = Math.min(Math.max(val,0),100); batLevel.style.width = val+'%'; batText.innerText = val; batText.style.color = val>50?'black':(val<20?'red':'white'); }
     batText.addEventListener('input',()=>{ let v=parseInt(batText.innerText); if(!isNaN(v)) updateBatteryUI(v); saveAllData(); });
 
-    // USSD dragging
     const ussdBox = document.getElementById('ussdBox');
     const btnCancel = document.getElementById('btnCancel');
     const btnSend = document.getElementById('btnSend');
     let isDraggingUssd = false;
     btnCancel.addEventListener('mousedown', startDragUssd);
-    btnCancel.addEventListener('touchstart', startDragUssd);
+    btnCancel.addEventListener('touchstart', startDragUssd, { passive: false });
     window.addEventListener('mouseup', stopDragUssd);
     window.addEventListener('touchend', stopDragUssd);
     window.addEventListener('mousemove', onDragMove);
     window.addEventListener('touchmove', onDragMove, { passive: false });
     function startDragUssd(e) { isDraggingUssd = true; ussdBox.style.transition = 'none'; e.preventDefault(); }
     function stopDragUssd() { isDraggingUssd = false; ussdBox.style.transition = 'bottom 0.1s ease-out'; saveAllData(); }
-    function onDragMove(e) { if (!isDraggingUssd) return; let clientY = e.touches ? e.touches[0].clientY : e.clientY; let phoneRect = document.getElementById('phoneFrame').getBoundingClientRect(); let newBottom = phoneRect.bottom - clientY - 30; if (newBottom < 20) newBottom = 20; if (newBottom > phoneRect.height - ussdBox.offsetHeight + 10) newBottom = phoneRect.height - ussdBox.offsetHeight + 10; ussdBox.style.bottom = newBottom + 'px'; }
+    function onDragMove(e) { if (!isDraggingUssd) return; let clientY = e.touches ? e.touches[0].clientY : e.clientY; let phoneRect = phoneFrame.getBoundingClientRect(); let newBottom = phoneRect.bottom - clientY - 30; if (newBottom < 20) newBottom = 20; if (newBottom > phoneRect.height - ussdBox.offsetHeight + 10) newBottom = phoneRect.height - ussdBox.offsetHeight + 10; ussdBox.style.bottom = newBottom + 'px'; }
     btnSend.onclick = (e) => { e.preventDefault(); return false; };
     btnCancel.onclick = (e) => { e.preventDefault(); return false; };
 
@@ -214,9 +417,60 @@
     function removeDuplicates() { const area = document.getElementById('waNumbers'); const lines = area.value.split('\n').map(l=>l.trim()).filter(l=>l!==""); area.value=[...new Set(lines)].join('\n'); checkDuplicates(); updateCounter(); }
     function updateCounter() { const cnt = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!=="").length; document.getElementById('waCounter').innerText = "الأرقام المتبقية: "+cnt; list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!==""); }
     function syncAmountUI(){ const toggle = document.getElementById('randomAmountToggle'); const fixedDiv = document.getElementById('fixedAmountDiv'); const randomDiv = document.getElementById('randomAmountDiv'); if(amountMode === 'random'){ toggle.checked = true; fixedDiv.style.display = 'none'; randomDiv.style.display = 'block'; } else { toggle.checked = false; fixedDiv.style.display = 'block'; randomDiv.style.display = 'none'; } }
-    window.saveWA = () => { list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!==""); fixedFees = parseInt(document.getElementById('fixedFees').value) || 3; fixedTransfer = parseInt(document.getElementById('fixedTransferAmount').value) || 200; minRandom = parseInt(document.getElementById('minRandomAmount').value) || 501; maxRandom = parseInt(document.getElementById('maxRandomAmount').value) || 576; if(minRandom > maxRandom) { let tmp=minRandom; minRandom=maxRandom; maxRandom=tmp; } showDateUnderWeather = document.getElementById('showDateUnderWeather').checked; dateFrom = document.getElementById('dateFrom').value; dateTo = document.getElementById('dateTo').value; dateTypeChecked = document.getElementById('dateType').checked; amountMode = document.getElementById('randomAmountToggle').checked ? 'random' : 'fixed'; updateCounter(); closeWA(); saveAllData(); alert("تم حفظ الإعدادات"); };
+
+    document.getElementById('customOverlayToggle').addEventListener('change', function(e){
+        customOverlayEnabled = this.checked;
+        document.getElementById('customOverlayInputs').style.display = customOverlayEnabled ? 'block' : 'none';
+        if(customOverlayEnabled){
+            customTimeValue = document.getElementById('customTimeInput').value || '12:00';
+            customDateValue = document.getElementById('customDateInput').value || '2026-01-01';
+        }
+        saveAllData();
+    });
+    document.getElementById('customTimeInput').addEventListener('input', function(){ customTimeValue = this.value; saveAllData(); });
+    document.getElementById('customDateInput').addEventListener('input', function(){ customDateValue = this.value; saveAllData(); });
+
+    window.saveWA = () => {
+        list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!=="");
+        fixedFees = parseInt(document.getElementById('fixedFees').value) || 3;
+        fixedTransfer = parseInt(document.getElementById('fixedTransferAmount').value) || 200;
+        minRandom = parseInt(document.getElementById('minRandomAmount').value) || 501;
+        maxRandom = parseInt(document.getElementById('maxRandomAmount').value) || 576;
+        if(minRandom > maxRandom) { let tmp=minRandom; minRandom=maxRandom; maxRandom=tmp; }
+        showDateUnderWeather = document.getElementById('showDateUnderWeather').checked;
+        dateFrom = document.getElementById('dateFrom').value;
+        dateTo = document.getElementById('dateTo').value;
+        dateTypeChecked = document.getElementById('dateType').checked;
+        amountMode = document.getElementById('randomAmountToggle').checked ? 'random' : 'fixed';
+        customOverlayEnabled = document.getElementById('customOverlayToggle').checked;
+        customTimeValue = document.getElementById('customTimeInput').value || '12:00';
+        customDateValue = document.getElementById('customDateInput').value || '2026-01-01';
+        updateCounter();
+        closeWA();
+        saveAllData();
+        alert("تم حفظ الإعدادات");
+    };
     window.closeWA = () => { document.getElementById('waControl').style.display = 'none'; };
-    document.getElementById('waAppBtn').addEventListener('click', () => { document.getElementById('waControl').style.display = 'flex'; document.getElementById('waNumbers').value = list.join('\n'); document.getElementById('fixedFees').value = fixedFees; document.getElementById('fixedTransferAmount').value = fixedTransfer; document.getElementById('minRandomAmount').value = minRandom; document.getElementById('maxRandomAmount').value = maxRandom; document.getElementById('showDateUnderWeather').checked = showDateUnderWeather; document.getElementById('dateFrom').value = dateFrom; document.getElementById('dateTo').value = dateTo; document.getElementById('dateType').checked = dateTypeChecked; document.getElementById('randomAmountToggle').checked = (amountMode === 'random'); syncAmountUI(); checkDuplicates(); updateCounter(); });
+    document.getElementById('waAppBtn').addEventListener('click', () => {
+        document.getElementById('waControl').style.display = 'flex';
+        document.getElementById('waNumbers').value = list.join('\n');
+        document.getElementById('fixedFees').value = fixedFees;
+        document.getElementById('fixedTransferAmount').value = fixedTransfer;
+        document.getElementById('minRandomAmount').value = minRandom;
+        document.getElementById('maxRandomAmount').value = maxRandom;
+        document.getElementById('showDateUnderWeather').checked = showDateUnderWeather;
+        document.getElementById('dateFrom').value = dateFrom;
+        document.getElementById('dateTo').value = dateTo;
+        document.getElementById('dateType').checked = dateTypeChecked;
+        document.getElementById('randomAmountToggle').checked = (amountMode === 'random');
+        document.getElementById('customOverlayToggle').checked = customOverlayEnabled;
+        document.getElementById('customOverlayInputs').style.display = customOverlayEnabled ? 'block' : 'none';
+        document.getElementById('customTimeInput').value = customTimeValue;
+        document.getElementById('customDateInput').value = customDateValue;
+        syncAmountUI();
+        checkDuplicates();
+        updateCounter();
+    });
     document.getElementById('randomAmountToggle').addEventListener('change', function(e){ amountMode = this.checked ? 'random' : 'fixed'; syncAmountUI(); saveAllData(); });
 
     function getRandomSpeed(){ let units=['K/s','M/s']; let unit=units[Math.floor(Math.random()*units.length)]; let val=unit==='K/s'?(Math.random()*900+10).toFixed(1):(Math.random()*4+0.1).toFixed(1); return {val,unit}; }
@@ -228,18 +482,69 @@
     for(let i=1;i<=80;i++) backgrounds.push(`https://picsum.photos/seed/girlStyle_${i}/900/1600`);
     for(let i=1;i<=40;i++) backgrounds.push(`https://picsum.photos/seed/fashionBeauty_${i}/900/1600`);
 
-    document.getElementById('fbAppBtn').addEventListener('click', function() { if (list.length === 0) { alert("القائمة فارغة! يرجى فتح واتساب وإدخال أرقام."); return; } const phone = list.shift(); document.getElementById('waNumbers').value = list.join('\n'); updateCounter(); const amount = getCurrentTransferAmount(); const fees = fixedFees; const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5; const d1 = new Date(dateFrom); const d2 = new Date(dateTo); const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime())); document.getElementById('phone-num').innerText = phone; document.getElementById('amount').innerText = amount; document.getElementById('fees').innerText = fees; updateBatteryUI(batt); let h = randD.getHours() % 12 || 12; let m = randD.getMinutes(); let hS = h < 10 ? "0"+h : h.toString(); let mS = m < 10 ? "0"+m : m.toString(); const arabicTime = toAr(hS) + ':' + toAr(mS); document.getElementById('clockTime').innerText = arabicTime; document.getElementById('widgetClock').innerText = arabicTime; updateDateDisplay(randD); const speedData = getRandomSpeed(); document.getElementById('speedVal').innerText = speedData.val; document.getElementById('speedUnit').innerText = speedData.unit; updateWeatherUI(); removeZeroFromClock(); saveAllData(); });
-    document.getElementById('telegramBtn').addEventListener('click', function() { const randomBG = backgrounds[Math.floor(Math.random() * backgrounds.length)]; document.getElementById('phoneFrame').style.backgroundImage = `url('${randomBG}')`; });
+    document.getElementById('fbAppBtn').addEventListener('click', function() {
+        if (list.length === 0) { alert("القائمة فارغة! يرجى فتح واتساب وإدخال أرقام."); return; }
+        const phone = list.shift();
+        document.getElementById('waNumbers').value = list.join('\n');
+        updateCounter();
+        const amount = getCurrentTransferAmount();
+        const fees = fixedFees;
+        const batt = Math.floor(Math.random() * (85 - 5 + 1)) + 5;
+        
+        if (customOverlayEnabled) {
+            const timeParts = customTimeValue.split(':');
+            let h = parseInt(timeParts[0]) || 12;
+            let m = timeParts[1] || '00';
+            let h12 = h % 12 || 12;
+            let hS = h12 < 10 ? "0"+h12 : h12.toString();
+            let mS = m.padStart(2, '0');
+            const arabicTime = toAr(hS) + ':' + toAr(mS);
+            document.getElementById('clockTime').innerText = arabicTime;
+            document.getElementById('widgetClock').innerText = arabicTime;
+            const d = new Date(customDateValue + 'T00:00:00');
+            if (!isNaN(d.getTime())) { updateDateDisplay(d); } else { updateDateDisplay(new Date()); }
+        } else {
+            const d1 = new Date(dateFrom);
+            const d2 = new Date(dateTo);
+            const randD = new Date(d1.getTime() + Math.random() * (d2.getTime() - d1.getTime()));
+            let h = randD.getHours() % 12 || 12;
+            let m = randD.getMinutes();
+            let hS = h < 10 ? "0"+h : h.toString();
+            let mS = m < 10 ? "0"+m : m.toString();
+            const arabicTime = toAr(hS) + ':' + toAr(mS);
+            document.getElementById('clockTime').innerText = arabicTime;
+            document.getElementById('widgetClock').innerText = arabicTime;
+            updateDateDisplay(randD);
+        }
+        
+        document.getElementById('phone-num').innerText = phone;
+        document.getElementById('amount').innerText = amount;
+        document.getElementById('fees').innerText = fees;
+        updateBatteryUI(batt);
+        const speedData = getRandomSpeed();
+        document.getElementById('speedVal').innerText = speedData.val;
+        document.getElementById('speedUnit').innerText = speedData.unit;
+        updateWeatherUI();
+        removeZeroFromClock();
+        saveAllData();
+    });
+    document.getElementById('telegramBtn').addEventListener('click', function() {
+        const randomBG = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+        bgLayer.style.backgroundImage = `url('${randomBG}')`;
+        bgLayer.style.backgroundPosition = 'center';
+        bgLayer.style.backgroundSize = 'cover';
+    });
 
-    function saveAllData() { const data = { h: document.getElementById('clockTime').innerText, b: batText.innerText, d: document.getElementById('tempText').innerText, amount: document.getElementById('amount').innerText, phone: document.getElementById('phone-num').innerText, fees: document.getElementById('fees').innerText, ussdMsg: document.getElementById('ussdMsgInput').value, pos: ussdBox.style.bottom, list: list, fixedFees: fixedFees, fixedTransfer: fixedTransfer, amountMode: amountMode, minRandom: minRandom, maxRandom: maxRandom, showDateUnderWeather: showDateUnderWeather, dateFrom: dateFrom, dateTo: dateTo, dateTypeChecked: dateTypeChecked }; localStorage.setItem('merged_miui_final', JSON.stringify(data)); }
+    function saveAllData() {
+        const data = { h: document.getElementById('clockTime').innerText, b: batText.innerText, d: document.getElementById('tempText').innerText, amount: document.getElementById('amount').innerText, phone: document.getElementById('phone-num').innerText, fees: document.getElementById('fees').innerText, ussdMsg: document.getElementById('ussdMsgInput').value, pos: ussdBox.style.bottom, list, fixedFees, fixedTransfer, amountMode, minRandom, maxRandom, showDateUnderWeather, dateFrom, dateTo, dateTypeChecked, customOverlayEnabled, customTimeValue, customDateValue };
+        localStorage.setItem('merged_miui_final', JSON.stringify(data));
+    }
 
-    // ================== معرض الصور والتعديل ==================
+    // ========== معرض الصور مع إطارات منفصلة وزر حذف الكل ==========
     let galleryImages = [];
     let currentBgIndex = -1;
-    let editingIndex = null;
-    let editX = 50, editY = 50, editZoom = 100;
 
-    function saveGallery() { try { localStorage.setItem('phone_gallery', JSON.stringify(galleryImages)); if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex); } catch(e) { alert("⚠️ مساحة التخزين ممتلئة. حاول حذف بعض الصور أو استخدم صوراً أصغر."); } }
+    function saveGallery() { try { localStorage.setItem('phone_gallery', JSON.stringify(galleryImages)); if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex); } catch(e) { console.log('التخزين ممتلئ، المعرض يعمل في الذاكرة.'); } }
     function loadGallery() {
         const stored = localStorage.getItem('phone_gallery');
         if(stored) galleryImages = JSON.parse(stored);
@@ -252,9 +557,9 @@
     function applyBackground() {
         if(currentBgIndex<0 || !galleryImages[currentBgIndex]) return;
         const img = galleryImages[currentBgIndex];
-        document.getElementById('phoneFrame').style.backgroundImage = `url('${img.url}')`;
-        document.getElementById('phoneFrame').style.backgroundPosition = img.pos || "50% 50%";
-        document.getElementById('phoneFrame').style.backgroundSize = img.size || "cover";
+        bgLayer.style.backgroundImage = `url('${img.url}')`;
+        bgLayer.style.backgroundPosition = img.pos || "50% 50%";
+        bgLayer.style.backgroundSize = img.size || "cover";
     }
     function addImages(files) {
         Array.from(files).forEach(file => {
@@ -263,70 +568,58 @@
             reader.readAsDataURL(file);
         });
     }
-    function deleteImage(idx) { if(confirm("حذف الصورة نهائياً؟")){ galleryImages.splice(idx,1); if(galleryImages.length===0) galleryImages.push({ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }); if(currentBgIndex>=galleryImages.length) currentBgIndex=galleryImages.length-1; if(currentBgIndex<0 && galleryImages.length) currentBgIndex=0; applyBackground(); renderGallery(); saveGallery(); } }
-    function moveImage(idx, dir) {
-        if(dir==='up' && idx>0){ [galleryImages[idx-1], galleryImages[idx]] = [galleryImages[idx], galleryImages[idx-1]]; if(currentBgIndex===idx) currentBgIndex=idx-1; else if(currentBgIndex===idx-1) currentBgIndex=idx; renderGallery(); saveGallery(); }
-        else if(dir==='down' && idx<galleryImages.length-1){ [galleryImages[idx+1], galleryImages[idx]] = [galleryImages[idx], galleryImages[idx+1]]; if(currentBgIndex===idx) currentBgIndex=idx+1; else if(currentBgIndex===idx+1) currentBgIndex=idx; renderGallery(); saveGallery(); }
+    function deleteImage(idx) { 
+        if(confirm("حذف الصورة نهائياً؟")){ 
+            galleryImages.splice(idx,1); 
+            if(galleryImages.length===0) galleryImages.push({ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }); 
+            if(currentBgIndex>=galleryImages.length) currentBgIndex=galleryImages.length-1; 
+            if(currentBgIndex<0 && galleryImages.length) currentBgIndex=0; 
+            applyBackground(); 
+            renderGallery(); 
+            saveGallery(); 
+        } 
     }
-    function setBackground(idx) { currentBgIndex = idx; applyBackground(); renderGallery(); saveGallery(); }
-    function openEdit(idx) {
-        editingIndex = idx;
-        const img = galleryImages[idx];
-        let pos = img.pos || "50% 50%";
-        let parts = pos.split(' ');
-        editX = parseFloat(parts[0]) || 50;
-        editY = parseFloat(parts[1]) || 50;
-        let size = img.size || "cover";
-        editZoom = (size==='cover') ? 100 : (size.endsWith('%') ? parseInt(size) : 100);
-        document.getElementById('zoomPercentEdit').innerText = editZoom+'%';
-        document.getElementById('editBar').style.display = 'flex';
-        // معاينة مؤقتة على الخلفية
-        document.getElementById('phoneFrame').style.backgroundImage = `url('${img.url}')`;
-        document.getElementById('phoneFrame').style.backgroundPosition = `${editX}% ${editY}%`;
-        document.getElementById('phoneFrame').style.backgroundSize = (editZoom===100 ? 'cover' : editZoom+'%');
-    }
-    function closeEdit() {
-        if(editingIndex !== null && editingIndex !== currentBgIndex) applyBackground();
-        editingIndex = null;
-        document.getElementById('editBar').style.display = 'none';
-    }
-    function applyEdit() {
-        if(editingIndex !== null){
-            galleryImages[editingIndex].pos = `${editX}% ${editY}%`;
-            galleryImages[editingIndex].size = (editZoom===100 ? 'cover' : editZoom+'%');
-            if(editingIndex === currentBgIndex) applyBackground();
+    function deleteAllImages() {
+        if(confirm("هل أنت متأكد من حذف جميع الصور؟ ستبقى الخلفية الافتراضية فقط.")) {
+            galleryImages = [{ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }];
+            currentBgIndex = 0;
+            applyBackground();
             renderGallery();
             saveGallery();
         }
-        closeEdit();
     }
-    function replaceImage() {
-        if(editingIndex===null) return;
-        let input = document.createElement('input'); input.type='file'; input.accept='image/*';
-        input.onchange=e=>{ if(e.target.files[0]){ const reader=new FileReader(); reader.onload=ev=>{ galleryImages[editingIndex].url=ev.target.result; if(editingIndex===currentBgIndex) applyBackground(); renderGallery(); saveGallery(); if(document.getElementById('editBar').style.display === 'flex') { document.getElementById('phoneFrame').style.backgroundImage = `url('${ev.target.result}')`; document.getElementById('phoneFrame').style.backgroundPosition = `${editX}% ${editY}%`; document.getElementById('phoneFrame').style.backgroundSize = (editZoom===100?'cover':editZoom+'%'); } }; reader.readAsDataURL(e.target.files[0]); } }; input.click();
-    }
-    function resetEdit() { editX=50; editY=50; editZoom=100; document.getElementById('zoomPercentEdit').innerText='100%'; document.getElementById('phoneFrame').style.backgroundPosition = '50% 50%'; document.getElementById('phoneFrame').style.backgroundSize = 'cover'; }
-    function updatePreview() { document.getElementById('phoneFrame').style.backgroundPosition = `${editX}% ${editY}%`; document.getElementById('phoneFrame').style.backgroundSize = (editZoom===100 ? 'cover' : editZoom+'%'); document.getElementById('zoomPercentEdit').innerText = editZoom+'%'; }
+    function setBackground(idx) { currentBgIndex = idx; applyBackground(); renderGallery(); saveGallery(); }
+    
     function renderGallery() {
-        const grid = document.getElementById('galleryGrid'); if(!grid) return;
-        if(galleryImages.length===0){ grid.innerHTML='<div class="gallery-empty">لا توجد صور، أضف صوراً</div>'; return; }
+        const grid = document.getElementById('galleryGrid'); 
+        if(!grid) return;
+        if(galleryImages.length===0){ 
+            grid.innerHTML='<div class="gallery-empty" style="grid-column:span 3;text-align:center;padding:20px;">لا توجد صور، أضف صوراً</div>'; 
+            return; 
+        }
         grid.innerHTML='';
         galleryImages.forEach((img,idx)=>{
-            const div = document.createElement('div'); div.className='gallery-item'; if(currentBgIndex===idx) div.classList.add('active');
-            const imgEl = document.createElement('img'); imgEl.src=img.url; imgEl.onclick=()=>setBackground(idx);
+            const div = document.createElement('div'); 
+            div.className='gallery-item'; 
+            if(currentBgIndex===idx) div.classList.add('active');
+            
+            const imgEl = document.createElement('img'); 
+            imgEl.src=img.url; 
+            imgEl.onclick=()=>setBackground(idx);
             div.appendChild(imgEl);
-            const btns = document.createElement('div'); btns.className='item-buttons';
-            const editBtn = document.createElement('div'); editBtn.innerText='✏️'; editBtn.onclick=(e)=>{ e.stopPropagation(); openEdit(idx); };
-            const delBtn = document.createElement('div'); delBtn.innerText='🗑️'; delBtn.onclick=(e)=>{ e.stopPropagation(); deleteImage(idx); };
-            const upBtn = document.createElement('div'); upBtn.innerText='⬆️'; upBtn.onclick=(e)=>{ e.stopPropagation(); moveImage(idx,'up'); };
-            const downBtn = document.createElement('div'); downBtn.innerText='⬇️'; downBtn.onclick=(e)=>{ e.stopPropagation(); moveImage(idx,'down'); };
-            btns.appendChild(editBtn); btns.appendChild(delBtn); btns.appendChild(upBtn); btns.appendChild(downBtn);
-            div.appendChild(btns);
+
+            const delBtn = document.createElement('button'); 
+            delBtn.className='delete-btn';
+            delBtn.innerHTML='<i class="fas fa-trash"></i>';
+            delBtn.onclick=(e)=>{ e.stopPropagation(); deleteImage(idx); };
+            div.appendChild(delBtn);
+
             grid.appendChild(div);
         });
     }
+
     function openGallery() { renderGallery(); document.getElementById('galleryModal').style.display='flex'; }
-    function closeGallery() { document.getElementById('editBar').style.display='none'; editingIndex=null; document.getElementById('galleryModal').style.display='none'; }
+    function closeGallery() { document.getElementById('galleryModal').style.display='none'; }
     function randomBackground() { if(galleryImages.length) setBackground(Math.floor(Math.random()*galleryImages.length)); }
     function resetBackgroundToOriginal() {
         const originalUrl = "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000";
@@ -340,23 +633,14 @@
         alert("تمت إعادة الخلفية إلى الأصلية");
     }
 
-    // ربط الأزرار الجديدة
     document.getElementById('phoneBtn').addEventListener('click', openGallery);
     document.getElementById('instagramBtn').addEventListener('click', randomBackground);
     document.getElementById('closeGalleryBtn').addEventListener('click', closeGallery);
     document.getElementById('addImageBtn').addEventListener('click', ()=>document.getElementById('fileInput').click());
+    document.getElementById('deleteAllBtn').addEventListener('click', deleteAllImages);
     document.getElementById('fileInput').addEventListener('change', e=>{ addImages(e.target.files); e.target.value=''; });
     document.getElementById('galleryModal').addEventListener('click', e=>{ if(e.target===document.getElementById('galleryModal')) closeGallery(); });
-    document.getElementById('moveUpEdit').onclick = () => { editY = Math.max(0, editY-5); updatePreview(); };
-    document.getElementById('moveDownEdit').onclick = () => { editY = Math.min(100, editY+5); updatePreview(); };
-    document.getElementById('moveLeftEdit').onclick = () => { editX = Math.max(0, editX-5); updatePreview(); };
-    document.getElementById('moveRightEdit').onclick = () => { editX = Math.min(100, editX+5); updatePreview(); };
-    document.getElementById('zoomInEdit').onclick = () => { editZoom = Math.min(300, editZoom+10); updatePreview(); };
-    document.getElementById('zoomOutEdit').onclick = () => { editZoom = Math.max(30, editZoom-10); updatePreview(); };
-    document.getElementById('resetEditBtn').onclick = resetEdit;
-    document.getElementById('applyEditBtn').onclick = applyEdit;
 
-    // يوتيوب: الضغط المطول يعيد الخلفية للأصلية
     const youtubeBtn = document.getElementById('youtubeApp');
     let pressTimerYoutube;
     youtubeBtn.addEventListener('mousedown', () => { pressTimerYoutube = setTimeout(resetBackgroundToOriginal, 2000); });
@@ -370,8 +654,7 @@
             const d = JSON.parse(saved);
             document.getElementById('clockTime').innerText = d.h || '١٢:٥٩';
             document.getElementById('widgetClock').innerText = d.h || '١٢:٥٩';
-            batText.innerText = d.b || '90';
-            updateBatteryUI(parseInt(d.b) || 90);
+            batText.innerText = d.b || '90'; updateBatteryUI(parseInt(d.b) || 90);
             document.getElementById('tempText').innerText = d.d || '٢٤°م';
             document.getElementById('amount').innerText = d.amount || '200';
             document.getElementById('phone-num').innerText = d.phone || '01036543568';
@@ -379,25 +662,26 @@
             document.getElementById('ussdMsgInput').value = d.ussdMsg || '';
             ussdBox.style.bottom = d.pos || '40px';
             list = d.list || [];
-            fixedFees = d.fixedFees || 3;
-            fixedTransfer = d.fixedTransfer || 200;
-            amountMode = d.amountMode || 'fixed';
-            minRandom = d.minRandom || 501;
-            maxRandom = d.maxRandom || 576;
+            fixedFees = d.fixedFees || 3; fixedTransfer = d.fixedTransfer || 200;
+            amountMode = d.amountMode || 'fixed'; minRandom = d.minRandom || 501; maxRandom = d.maxRandom || 576;
             showDateUnderWeather = d.showDateUnderWeather !== undefined ? d.showDateUnderWeather : true;
-            dateFrom = d.dateFrom || '2025-12-05';
-            dateTo = d.dateTo || '2026-01-11';
+            dateFrom = d.dateFrom || '2025-12-05'; dateTo = d.dateTo || '2026-01-11';
             dateTypeChecked = d.dateTypeChecked !== undefined ? d.dateTypeChecked : true;
+            customOverlayEnabled = d.customOverlayEnabled || false;
+            customTimeValue = d.customTimeValue || '12:00'; customDateValue = d.customDateValue || '2026-01-01';
             document.getElementById('waNumbers').value = list.join('\n');
             document.getElementById('fixedFees').value = fixedFees;
             document.getElementById('fixedTransferAmount').value = fixedTransfer;
             document.getElementById('minRandomAmount').value = minRandom;
             document.getElementById('maxRandomAmount').value = maxRandom;
             document.getElementById('showDateUnderWeather').checked = showDateUnderWeather;
-            document.getElementById('dateFrom').value = dateFrom;
-            document.getElementById('dateTo').value = dateTo;
+            document.getElementById('dateFrom').value = dateFrom; document.getElementById('dateTo').value = dateTo;
             document.getElementById('dateType').checked = dateTypeChecked;
             document.getElementById('randomAmountToggle').checked = (amountMode === 'random');
+            document.getElementById('customOverlayToggle').checked = customOverlayEnabled;
+            document.getElementById('customOverlayInputs').style.display = customOverlayEnabled ? 'block' : 'none';
+            document.getElementById('customTimeInput').value = customTimeValue;
+            document.getElementById('customDateInput').value = customDateValue;
             syncAmountUI();
             updateCounter();
         } else { syncAmountUI(); }
@@ -405,5 +689,223 @@
         loadGallery();
     };
 </script>
+
+<!-- ===== سكريبت ميزة تخصيص الأيقونات (تيك توك) ===== -->
+<script>
+    (function() {
+        // الإعدادات الافتراضية لكل تطبيق بالترتيب
+        const appDefaults = [
+            { iconHtml: '<i class="fab fa-whatsapp" style="color:white"></i>', bg: '#25D366', name: 'واتساب' },
+            { iconHtml: '<i class="fab fa-facebook" style="color:white"></i>', bg: '#1877F2', name: 'فيسبوك' },
+            { iconHtml: '<i class="fab fa-telegram" style="color:white"></i>', bg: '#0088cc', name: 'تيليجرام' },
+            { iconHtml: '<i class="fab fa-youtube" style="color:white"></i>', bg: '#f00', name: 'يوتيوب' },
+            { iconHtml: '<img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="35" alt="Google">', bg: '#fff', name: 'جوجل' },
+            { iconHtml: '<i class="fab fa-tiktok" style="color:white"></i>', bg: '#000', name: 'تيك توك' },
+            { iconHtml: '<i class="fab fa-instagram" style="color:white"></i>', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', name: 'إنستجرام' },
+            { iconHtml: '<i class="fas fa-phone" style="color:white"></i>', bg: '#4caf50', name: 'الهاتف' }
+        ];
+
+        const STORAGE_KEY = 'tiktok_custom_apps';
+
+        // عناصر الأيقونات في الشاشة الرئيسية
+        const appItems = document.querySelectorAll('.app-item');
+        
+        // الحالة الحالية المحفوظة
+        let customApps = [];
+
+        function loadCustomApps() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    customApps = JSON.parse(stored);
+                    if (!Array.isArray(customApps) || customApps.length !== 8) throw new Error('invalid');
+                } catch (e) {
+                    customApps = [];
+                }
+            } else {
+                customApps = [];
+            }
+        }
+
+        function saveCustomApps() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(customApps));
+            } catch (e) {
+                alert('تعذر حفظ الأيقونات، مساحة التخزين ممتلئة.');
+            }
+        }
+
+        // تطبيق مظهر تطبيق معين على الشاشة الرئيسية
+        function applyAppAppearance(index) {
+            if (index < 0 || index >= appItems.length) return;
+            const appItem = appItems[index];
+            const iconBox = appItem.querySelector('.icon-box');
+            const nameEl = appItem.querySelector('.app-name');
+            const custom = customApps[index] || {};
+            const def = appDefaults[index];
+
+            // الاسم
+            nameEl.textContent = custom.name || def.name;
+
+            // الأيقونة
+            if (custom.iconDataUrl) {
+                iconBox.innerHTML = `<img src="${custom.iconDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
+                iconBox.style.background = '#ffffff';
+            } else {
+                iconBox.innerHTML = def.iconHtml;
+                iconBox.style.background = def.bg;
+            }
+        }
+
+        // تطبيق جميع التطبيقات
+        function applyAllAppearances() {
+            for (let i = 0; i < appItems.length; i++) {
+                applyAppAppearance(i);
+            }
+        }
+
+        // إعادة تعيين الكل إلى الإفتراضي
+        function resetAllToDefault() {
+            customApps = [];
+            saveCustomApps();
+            applyAllAppearances();
+            buildSettingsUI(); // تحديث صفحة الإعدادات
+            alert('تمت إعادة جميع الأيقونات إلى الأصل');
+        }
+
+        // قراءة صورة من ملف وإرجاع dataUrl
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // بناء واجهة الإعدادات داخل tiktokBody
+        function buildSettingsUI() {
+            const body = document.getElementById('tiktokBody');
+            if (!body) return;
+            body.innerHTML = '';
+
+            for (let i = 0; i < appDefaults.length; i++) {
+                const def = appDefaults[i];
+                const custom = customApps[i] || {};
+                const currentName = custom.name || def.name;
+                const currentIconDataUrl = custom.iconDataUrl || null;
+
+                const card = document.createElement('div');
+                card.className = 'tiktok-card';
+
+                // معاينة الأيقونة
+                const preview = document.createElement('div');
+                preview.className = 'app-preview';
+                preview.style.background = currentIconDataUrl ? '#fff' : def.bg;
+                if (currentIconDataUrl) {
+                    preview.innerHTML = `<img src="${currentIconDataUrl}" alt="icon">`;
+                } else {
+                    preview.innerHTML = def.iconHtml;
+                }
+                card.appendChild(preview);
+
+                // معلومات الاسم ورفع الصورة
+                const info = document.createElement('div');
+                info.className = 'app-info';
+                info.innerHTML = `
+                    <label style="font-size:12px; font-weight:bold;">الاسم</label>
+                    <input type="text" class="app-name-input" value="${currentName}" data-index="${i}">
+                `;
+                card.appendChild(info);
+
+                // زر رفع صورة
+                const uploadBtn = document.createElement('button');
+                uploadBtn.className = 'file-upload-btn';
+                uploadBtn.textContent = '📷 تغيير الأيقونة';
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.style.display = 'none';
+                fileInput.dataset.index = i;
+                uploadBtn.addEventListener('click', () => fileInput.click());
+                card.appendChild(uploadBtn);
+                card.appendChild(fileInput);
+
+                body.appendChild(card);
+            }
+
+            // زر إعادة التعيين الكامل
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'tiktok-reset-btn';
+            resetBtn.textContent = '🔄 استعادة جميع الأيقونات إلى الأصل';
+            resetBtn.addEventListener('click', resetAllToDefault);
+            body.appendChild(resetBtn);
+
+            // ربط أحداث تغيير الاسم والملفات
+            attachSettingsEvents();
+        }
+
+        function attachSettingsEvents() {
+            // أحداث تغيير الاسم
+            document.querySelectorAll('.app-name-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const index = parseInt(this.dataset.index);
+                    if (!customApps[index]) customApps[index] = {};
+                    customApps[index].name = this.value.trim() || appDefaults[index].name;
+                    saveCustomApps();
+                    applyAppAppearance(index);
+                });
+            });
+
+            // أحداث رفع الصور
+            document.querySelectorAll('input[type="file"][data-index]').forEach(fileInput => {
+                fileInput.addEventListener('change', async function(e) {
+                    const index = parseInt(this.dataset.index);
+                    const file = this.files[0];
+                    if (!file) return;
+                    try {
+                        const dataUrl = await readFileAsDataURL(file);
+                        if (!customApps[index]) customApps[index] = {};
+                        customApps[index].iconDataUrl = dataUrl;
+                        saveCustomApps();
+                        applyAppAppearance(index);
+                        buildSettingsUI(); // إعادة بناء الواجهة لتعكس الصورة الجديدة
+                    } catch (err) {
+                        alert('فشل قراءة الصورة، تأكد من الملف.');
+                    }
+                });
+            });
+        }
+
+        // فتح / إغلاق صفحة الإعدادات
+        function openTikTokSettings() {
+            const settingsDiv = document.getElementById('tiktokSettings');
+            if (!settingsDiv) return;
+            loadCustomApps();
+            buildSettingsUI();
+            settingsDiv.style.display = 'flex';
+        }
+
+        window.closeTikTokSettings = function() {
+            const settingsDiv = document.getElementById('tiktokSettings');
+            if (settingsDiv) settingsDiv.style.display = 'none';
+        };
+
+        // ربط زر تيك توك في الشاشة الرئيسية
+        const tiktokAppItem = Array.from(appItems).find(item => item.querySelector('.app-name').textContent.trim() === 'تيك توك');
+        if (tiktokAppItem) {
+            tiktokAppItem.addEventListener('click', openTikTokSettings);
+        }
+
+        // عند تحميل الصفحة: تحميل الإعدادات وتطبيقها
+        window.addEventListener('load', () => {
+            loadCustomApps();
+            applyAllAppearances();
+        });
+
+        // حفظ الحالة الحالية للعرض عند أي تغيير يطرأ خارج الإعدادات (لا حاجة)
+    })();
+</script>
+
 </body>
 </html>
