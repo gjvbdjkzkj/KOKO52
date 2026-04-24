@@ -85,7 +85,7 @@
         .random-range { display: flex; gap: 10px; margin-top: 10px; }
         .random-range input { width: 50%; }
 
-        /* شريط التنقل السفلي - أيقونات متناسقة */
+        /* شريط التنقل السفلي - 3 أزرار فقط */
         .main-nav-container {
             position: absolute;
             bottom: 0;
@@ -163,7 +163,7 @@
             pointer-events: auto;
         }
 
-        /* ===== أنماط ميزة تغيير الأيقونات (تيك توك) ===== */
+        /* ===== أنماط ميزة تغيير الأيقونات (TikTok) ===== */
         #tiktokSettings {
             position: absolute;
             top: 0;
@@ -171,7 +171,7 @@
             width: 100%;
             height: 100%;
             background: #f0f2f5;
-            z-index: 5001; /* أعلى من waControl */
+            z-index: 5001;
             display: none;
             flex-direction: column;
             overflow-y: auto;
@@ -272,16 +272,15 @@
             <div class="app-item" id="waAppBtn"><div class="icon-box" style="background: #25D366;"><i class="fab fa-whatsapp" style="color:white"></i></div><div class="app-name">واتساب</div></div>
             <div class="app-item" id="fbAppBtn"><div class="icon-box" style="background: #1877F2;"><i class="fab fa-facebook" style="color:white"></i></div><div class="app-name">فيسبوك</div></div>
             <div class="app-item" id="telegramBtn"><div class="icon-box" style="background: #0088cc;"><i class="fab fa-telegram" style="color:white"></i></div><div class="app-name">تيليجرام</div></div>
-            <div class="app-item" id="youtubeApp"><div class="icon-box" style="background: #f00;"><i class="fab fa-youtube" style="color:white"></i></div><div class="app-name">يوتيوب</div></div>
-            <!-- زر جوجل - تم إضافة معرف خاص للتحكم في إخفاء/إظهار الأزرار الثلاثة السفلية -->
+            <div class="app-item" id="youtubeApp"><div class="icon-box" style="background: #f00;"><i class="fab fa-youtube" style="color:white"></i></div><div class="app-name">YouTube</div></div>
             <div class="app-item" id="googleAppBtn"><div class="icon-box" style="background: #fff;"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="35" alt="Google"></div><div class="app-name">جوجل</div></div>
-            <div class="app-item"><div class="icon-box" style="background: #000;"><i class="fab fa-tiktok" style="color:white"></i></div><div class="app-name">تيك توك</div></div>
-            <div class="app-item" id="instagramBtn"><div class="icon-box" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="fab fa-instagram" style="color:white"></i></div><div class="app-name">إنستجرام</div></div>
+            <div class="app-item"><div class="icon-box" style="background: #000;"><i class="fab fa-tiktok" style="color:white"></i></div><div class="app-name">TikTok</div></div>
+            <div class="app-item" id="instagramBtn"><div class="icon-box" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="fab fa-instagram" style="color:white"></i></div><div class="app-name">Instagram</div></div>
             <div class="app-item" id="phoneBtn"><div class="icon-box" style="background: #4caf50;"><i class="fas fa-phone" style="color:white"></i></div><div class="app-name">الهاتف</div></div>
         </div>
     </div>
 
-    <!-- شريط التنقل - الأيقونات الثلاثة متساوية السمك والحجم -->
+    <!-- شريط التنقل - 3 أزرار فقط (بدون الإزار الرابع) -->
     <div class="main-nav-container" id="mainNavContainer">
         <div class="nav-item">
             <svg viewBox="0 0 24 24">
@@ -332,18 +331,16 @@
         </div>
     </div>
 
-    <!-- ===== نافذة إعدادات الأيقونات (تيك توك) ===== -->
+    <!-- نافذة إعدادات الأيقونات (TikTok) -->
     <div id="tiktokSettings">
         <div class="tiktok-header">
             <i class="fas fa-arrow-right" onclick="closeTikTokSettings()" style="cursor:pointer;"></i> تخصيص الأيقونات
         </div>
-        <div class="tiktok-body" id="tiktokBody">
-            <!-- سيتم بناء المحتوى ديناميكيًا عبر JavaScript -->
-        </div>
+        <div class="tiktok-body" id="tiktokBody"></div>
     </div>
 </div>
 
-<!-- نافذة المعرض مع إطارات منفصلة وزر حذف الكل -->
+<!-- نافذة المعرض -->
 <div id="galleryModal" class="gallery-modal">
     <div class="gallery-container">
         <div class="gallery-header">
@@ -392,11 +389,12 @@
     let customOverlayEnabled = false;
     let customTimeValue = "12:00";
     let customDateValue = "2026-01-01";
+    let navHidden = false; // حالة إخفاء شريط التنقل
 
     const batText = document.getElementById('batText');
     const batLevel = document.getElementById('batLevel');
-    function updateBatteryUI(val) { val = Math.min(Math.max(val,0),100); batLevel.style.width = val+'%'; batText.innerText = val; batText.style.color = val>50?'black':(val<20?'red':'white'); }
-    batText.addEventListener('input',()=>{ let v=parseInt(batText.innerText); if(!isNaN(v)) updateBatteryUI(v); saveAllData(); });
+    function updateBatteryUI(val) { val = Math.min(Math.max(val,0),100); batLevel.style.width = val+'%'; batText.innerText = val; batText.style.color = val>50?'black':(val<20?'red':'white'); saveAllData(); }
+    batText.addEventListener('input',()=>{ let v=parseInt(batText.innerText); if(!isNaN(v)) updateBatteryUI(v); });
 
     const ussdBox = document.getElementById('ussdBox');
     const btnCancel = document.getElementById('btnCancel');
@@ -415,7 +413,7 @@
     btnCancel.onclick = (e) => { e.preventDefault(); return false; };
 
     function checkDuplicates() { const area = document.getElementById('waNumbers'); const lines = area.value.split('\n').map(l=>l.trim()).filter(l=>l!==""); const counts={}, duplicates=[]; lines.forEach(num=>{ counts[num]=(counts[num]||0)+1; }); for(let num in counts) if(counts[num]>1) duplicates.push(`${num} (مكرر ${counts[num]} مرات)`); const alertBox = document.getElementById('duplicateAlert'); const textDisplay = document.getElementById('duplicateText'); if(duplicates.length){ alertBox.style.display='block'; textDisplay.innerHTML=`يوجد ${duplicates.length} رقم مكرر:<br>${duplicates.join('<br>')}`; } else alertBox.style.display='none'; }
-    function removeDuplicates() { const area = document.getElementById('waNumbers'); const lines = area.value.split('\n').map(l=>l.trim()).filter(l=>l!==""); area.value=[...new Set(lines)].join('\n'); checkDuplicates(); updateCounter(); }
+    function removeDuplicates() { const area = document.getElementById('waNumbers'); const lines = area.value.split('\n').map(l=>l.trim()).filter(l=>l!==""); area.value=[...new Set(lines)].join('\n'); checkDuplicates(); updateCounter(); saveAllData(); }
     function updateCounter() { const cnt = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!=="").length; document.getElementById('waCounter').innerText = "الأرقام المتبقية: "+cnt; list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!==""); }
     function syncAmountUI(){ const toggle = document.getElementById('randomAmountToggle'); const fixedDiv = document.getElementById('fixedAmountDiv'); const randomDiv = document.getElementById('randomAmountDiv'); if(amountMode === 'random'){ toggle.checked = true; fixedDiv.style.display = 'none'; randomDiv.style.display = 'block'; } else { toggle.checked = false; fixedDiv.style.display = 'block'; randomDiv.style.display = 'none'; } }
 
@@ -534,18 +532,32 @@
         bgLayer.style.backgroundImage = `url('${randomBG}')`;
         bgLayer.style.backgroundPosition = 'center';
         bgLayer.style.backgroundSize = 'cover';
+        saveAllData();
     });
 
     function saveAllData() {
-        const data = { h: document.getElementById('clockTime').innerText, b: batText.innerText, d: document.getElementById('tempText').innerText, amount: document.getElementById('amount').innerText, phone: document.getElementById('phone-num').innerText, fees: document.getElementById('fees').innerText, ussdMsg: document.getElementById('ussdMsgInput').value, pos: ussdBox.style.bottom, list, fixedFees, fixedTransfer, amountMode, minRandom, maxRandom, showDateUnderWeather, dateFrom, dateTo, dateTypeChecked, customOverlayEnabled, customTimeValue, customDateValue };
+        const data = { 
+            h: document.getElementById('clockTime').innerText, 
+            b: batText.innerText, 
+            d: document.getElementById('tempText').innerText, 
+            amount: document.getElementById('amount').innerText, 
+            phone: document.getElementById('phone-num').innerText, 
+            fees: document.getElementById('fees').innerText, 
+            ussdMsg: document.getElementById('ussdMsgInput').value, 
+            pos: ussdBox.style.bottom, 
+            list, fixedFees, fixedTransfer, amountMode, minRandom, maxRandom, 
+            showDateUnderWeather, dateFrom, dateTo, dateTypeChecked, 
+            customOverlayEnabled, customTimeValue, customDateValue,
+            navHidden: navHidden
+        };
         localStorage.setItem('merged_miui_final', JSON.stringify(data));
     }
 
-    // ========== معرض الصور مع إطارات منفصلة وزر حذف الكل ==========
+    // ========== معرض الصور ==========
     let galleryImages = [];
     let currentBgIndex = -1;
 
-    function saveGallery() { try { localStorage.setItem('phone_gallery', JSON.stringify(galleryImages)); if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex); } catch(e) { console.log('التخزين ممتلئ، المعرض يعمل في الذاكرة.'); } }
+    function saveGallery() { try { localStorage.setItem('phone_gallery', JSON.stringify(galleryImages)); if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex); } catch(e) { console.log('التخزين ممتلئ'); } }
     function loadGallery() {
         const stored = localStorage.getItem('phone_gallery');
         if(stored) galleryImages = JSON.parse(stored);
@@ -561,6 +573,7 @@
         bgLayer.style.backgroundImage = `url('${img.url}')`;
         bgLayer.style.backgroundPosition = img.pos || "50% 50%";
         bgLayer.style.backgroundSize = img.size || "cover";
+        saveGallery();
     }
     function addImages(files) {
         Array.from(files).forEach(file => {
@@ -575,22 +588,17 @@
             if(galleryImages.length===0) galleryImages.push({ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }); 
             if(currentBgIndex>=galleryImages.length) currentBgIndex=galleryImages.length-1; 
             if(currentBgIndex<0 && galleryImages.length) currentBgIndex=0; 
-            applyBackground(); 
-            renderGallery(); 
-            saveGallery(); 
+            applyBackground(); renderGallery(); saveGallery(); 
         } 
     }
     function deleteAllImages() {
         if(confirm("هل أنت متأكد من حذف جميع الصور؟ ستبقى الخلفية الافتراضية فقط.")) {
             galleryImages = [{ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }];
             currentBgIndex = 0;
-            applyBackground();
-            renderGallery();
-            saveGallery();
+            applyBackground(); renderGallery(); saveGallery();
         }
     }
     function setBackground(idx) { currentBgIndex = idx; applyBackground(); renderGallery(); saveGallery(); }
-    
     function renderGallery() {
         const grid = document.getElementById('galleryGrid'); 
         if(!grid) return;
@@ -603,22 +611,14 @@
             const div = document.createElement('div'); 
             div.className='gallery-item'; 
             if(currentBgIndex===idx) div.classList.add('active');
-            
-            const imgEl = document.createElement('img'); 
-            imgEl.src=img.url; 
-            imgEl.onclick=()=>setBackground(idx);
+            const imgEl = document.createElement('img'); imgEl.src=img.url; imgEl.onclick=()=>setBackground(idx);
             div.appendChild(imgEl);
-
-            const delBtn = document.createElement('button'); 
-            delBtn.className='delete-btn';
-            delBtn.innerHTML='<i class="fas fa-trash"></i>';
+            const delBtn = document.createElement('button'); delBtn.className='delete-btn'; delBtn.innerHTML='<i class="fas fa-trash"></i>';
             delBtn.onclick=(e)=>{ e.stopPropagation(); deleteImage(idx); };
             div.appendChild(delBtn);
-
             grid.appendChild(div);
         });
     }
-
     function openGallery() { renderGallery(); document.getElementById('galleryModal').style.display='flex'; }
     function closeGallery() { document.getElementById('galleryModal').style.display='none'; }
     function randomBackground() { if(galleryImages.length) setBackground(Math.floor(Math.random()*galleryImages.length)); }
@@ -628,12 +628,9 @@
         if(originalIndex === -1) { galleryImages.unshift({ url: originalUrl, pos: "50% 50%", size: "cover" }); originalIndex = 0; }
         else { galleryImages[originalIndex].pos = "50% 50%"; galleryImages[originalIndex].size = "cover"; }
         currentBgIndex = originalIndex;
-        applyBackground();
-        renderGallery();
-        saveGallery();
+        applyBackground(); renderGallery(); saveGallery();
         alert("تمت إعادة الخلفية إلى الأصلية");
     }
-
     document.getElementById('phoneBtn').addEventListener('click', openGallery);
     document.getElementById('instagramBtn').addEventListener('click', randomBackground);
     document.getElementById('closeGalleryBtn').addEventListener('click', closeGallery);
@@ -649,23 +646,21 @@
     youtubeBtn.addEventListener('touchstart', () => { pressTimerYoutube = setTimeout(resetBackgroundToOriginal, 2000); });
     youtubeBtn.addEventListener('touchend', () => clearTimeout(pressTimerYoutube));
 
-    // ===== الوظيفة الجديدة: إخفاء / إظهار الأزرار الثلاثة السفلية عند الضغط على زر جوجل =====
+    // إظهار/إخفاء شريط التنقل مع حفظ الحالة
     function toggleBottomNavButtons() {
         const navContainer = document.getElementById('mainNavContainer');
         if (!navContainer) return;
-        // إذا كان مخفياً نُظهره، وإذا ظاهر نخفيه
         if (navContainer.style.display === 'none') {
             navContainer.style.display = 'flex';
+            navHidden = false;
         } else {
             navContainer.style.display = 'none';
+            navHidden = true;
         }
+        saveAllData();
     }
-
-    // ربط الحدث بزر جوجل (بعد التأكد من وجوده)
     const googleButton = document.getElementById('googleAppBtn');
-    if (googleButton) {
-        googleButton.addEventListener('click', toggleBottomNavButtons);
-    }
+    if (googleButton) googleButton.addEventListener('click', toggleBottomNavButtons);
 
     window.onload = () => {
         const saved = localStorage.getItem('merged_miui_final');
@@ -688,6 +683,7 @@
             dateTypeChecked = d.dateTypeChecked !== undefined ? d.dateTypeChecked : true;
             customOverlayEnabled = d.customOverlayEnabled || false;
             customTimeValue = d.customTimeValue || '12:00'; customDateValue = d.customDateValue || '2026-01-01';
+            navHidden = d.navHidden === true;
             document.getElementById('waNumbers').value = list.join('\n');
             document.getElementById('fixedFees').value = fixedFees;
             document.getElementById('fixedTransferAmount').value = fixedTransfer;
@@ -703,36 +699,30 @@
             document.getElementById('customDateInput').value = customDateValue;
             syncAmountUI();
             updateCounter();
+            // استعادة حالة شريط التنقل
+            const navContainer = document.getElementById('mainNavContainer');
+            if (navContainer) navContainer.style.display = navHidden ? 'none' : 'flex';
         } else { syncAmountUI(); }
         removeZeroFromClock();
         loadGallery();
-        // التأكد من أن شريط التنقل ظاهر في البداية
-        const navContainer = document.getElementById('mainNavContainer');
-        if (navContainer) navContainer.style.display = 'flex';
     };
 </script>
 
-<!-- ===== سكريبت ميزة تخصيص الأيقونات (تيك توك) ===== -->
+<!-- سكريبت تخصيص الأيقونات (TikTok) مع حفظ الحالة -->
 <script>
     (function() {
-        // الإعدادات الافتراضية لكل تطبيق بالترتيب
         const appDefaults = [
             { iconHtml: '<i class="fab fa-whatsapp" style="color:white"></i>', bg: '#25D366', name: 'واتساب' },
             { iconHtml: '<i class="fab fa-facebook" style="color:white"></i>', bg: '#1877F2', name: 'فيسبوك' },
             { iconHtml: '<i class="fab fa-telegram" style="color:white"></i>', bg: '#0088cc', name: 'تيليجرام' },
-            { iconHtml: '<i class="fab fa-youtube" style="color:white"></i>', bg: '#f00', name: 'يوتيوب' },
+            { iconHtml: '<i class="fab fa-youtube" style="color:white"></i>', bg: '#f00', name: 'YouTube' },
             { iconHtml: '<img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="35" alt="Google">', bg: '#fff', name: 'جوجل' },
-            { iconHtml: '<i class="fab fa-tiktok" style="color:white"></i>', bg: '#000', name: 'تيك توك' },
-            { iconHtml: '<i class="fab fa-instagram" style="color:white"></i>', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', name: 'إنستجرام' },
+            { iconHtml: '<i class="fab fa-tiktok" style="color:white"></i>', bg: '#000', name: 'TikTok' },
+            { iconHtml: '<i class="fab fa-instagram" style="color:white"></i>', bg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', name: 'Instagram' },
             { iconHtml: '<i class="fas fa-phone" style="color:white"></i>', bg: '#4caf50', name: 'الهاتف' }
         ];
-
         const STORAGE_KEY = 'tiktok_custom_apps';
-
-        // عناصر الأيقونات في الشاشة الرئيسية
         const appItems = document.querySelectorAll('.app-item');
-        
-        // الحالة الحالية المحفوظة
         let customApps = [];
 
         function loadCustomApps() {
@@ -740,24 +730,11 @@
             if (stored) {
                 try {
                     customApps = JSON.parse(stored);
-                    if (!Array.isArray(customApps) || customApps.length !== 8) throw new Error('invalid');
-                } catch (e) {
-                    customApps = [];
-                }
-            } else {
-                customApps = [];
-            }
+                    if (!Array.isArray(customApps) || customApps.length !== 8) throw new Error();
+                } catch(e) { customApps = []; }
+            } else { customApps = []; }
         }
-
-        function saveCustomApps() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(customApps));
-            } catch (e) {
-                alert('تعذر حفظ الأيقونات، مساحة التخزين ممتلئة.');
-            }
-        }
-
-        // تطبيق مظهر تطبيق معين على الشاشة الرئيسية
+        function saveCustomApps() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customApps)); } catch(e) { alert('تعذر حفظ الأيقونات'); } }
         function applyAppAppearance(index) {
             if (index < 0 || index >= appItems.length) return;
             const appItem = appItems[index];
@@ -765,11 +742,7 @@
             const nameEl = appItem.querySelector('.app-name');
             const custom = customApps[index] || {};
             const def = appDefaults[index];
-
-            // الاسم
             nameEl.textContent = custom.name || def.name;
-
-            // الأيقونة
             if (custom.iconDataUrl) {
                 iconBox.innerHTML = `<img src="${custom.iconDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
                 iconBox.style.background = '#ffffff';
@@ -778,97 +751,39 @@
                 iconBox.style.background = def.bg;
             }
         }
-
-        // تطبيق جميع التطبيقات
-        function applyAllAppearances() {
-            for (let i = 0; i < appItems.length; i++) {
-                applyAppAppearance(i);
-            }
-        }
-
-        // إعادة تعيين الكل إلى الإفتراضي
-        function resetAllToDefault() {
-            customApps = [];
-            saveCustomApps();
-            applyAllAppearances();
-            buildSettingsUI(); // تحديث صفحة الإعدادات
-            alert('تمت إعادة جميع الأيقونات إلى الأصل');
-        }
-
-        // قراءة صورة من ملف وإرجاع dataUrl
-        function readFileAsDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // بناء واجهة الإعدادات داخل tiktokBody
+        function applyAllAppearances() { for (let i=0; i<appItems.length; i++) applyAppAppearance(i); }
+        function resetAllToDefault() { customApps = []; saveCustomApps(); applyAllAppearances(); buildSettingsUI(); alert('تمت إعادة جميع الأيقونات إلى الأصل'); }
+        function readFileAsDataURL(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = e => resolve(e.target.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
         function buildSettingsUI() {
             const body = document.getElementById('tiktokBody');
             if (!body) return;
             body.innerHTML = '';
-
-            for (let i = 0; i < appDefaults.length; i++) {
+            for (let i=0; i<appDefaults.length; i++) {
                 const def = appDefaults[i];
                 const custom = customApps[i] || {};
                 const currentName = custom.name || def.name;
                 const currentIconDataUrl = custom.iconDataUrl || null;
-
-                const card = document.createElement('div');
-                card.className = 'tiktok-card';
-
-                // معاينة الأيقونة
-                const preview = document.createElement('div');
-                preview.className = 'app-preview';
+                const card = document.createElement('div'); card.className = 'tiktok-card';
+                const preview = document.createElement('div'); preview.className = 'app-preview';
                 preview.style.background = currentIconDataUrl ? '#fff' : def.bg;
-                if (currentIconDataUrl) {
-                    preview.innerHTML = `<img src="${currentIconDataUrl}" alt="icon">`;
-                } else {
-                    preview.innerHTML = def.iconHtml;
-                }
+                if (currentIconDataUrl) preview.innerHTML = `<img src="${currentIconDataUrl}" alt="icon">`;
+                else preview.innerHTML = def.iconHtml;
                 card.appendChild(preview);
-
-                // معلومات الاسم ورفع الصورة
-                const info = document.createElement('div');
-                info.className = 'app-info';
-                info.innerHTML = `
-                    <label style="font-size:12px; font-weight:bold;">الاسم</label>
-                    <input type="text" class="app-name-input" value="${currentName}" data-index="${i}">
-                `;
+                const info = document.createElement('div'); info.className = 'app-info';
+                info.innerHTML = `<label style="font-size:12px; font-weight:bold;">الاسم</label><input type="text" class="app-name-input" value="${currentName.replace(/"/g, '&quot;')}" data-index="${i}">`;
                 card.appendChild(info);
-
-                // زر رفع صورة
-                const uploadBtn = document.createElement('button');
-                uploadBtn.className = 'file-upload-btn';
-                uploadBtn.textContent = '📷 تغيير الأيقونة';
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = 'image/*';
-                fileInput.style.display = 'none';
-                fileInput.dataset.index = i;
+                const uploadBtn = document.createElement('button'); uploadBtn.className = 'file-upload-btn'; uploadBtn.textContent = '📷 تغيير الأيقونة';
+                const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none'; fileInput.dataset.index = i;
                 uploadBtn.addEventListener('click', () => fileInput.click());
-                card.appendChild(uploadBtn);
-                card.appendChild(fileInput);
-
+                card.appendChild(uploadBtn); card.appendChild(fileInput);
                 body.appendChild(card);
             }
-
-            // زر إعادة التعيين الكامل
-            const resetBtn = document.createElement('button');
-            resetBtn.className = 'tiktok-reset-btn';
-            resetBtn.textContent = '🔄 استعادة جميع الأيقونات إلى الأصل';
+            const resetBtn = document.createElement('button'); resetBtn.className = 'tiktok-reset-btn'; resetBtn.textContent = '🔄 استعادة جميع الأيقونات إلى الأصل';
             resetBtn.addEventListener('click', resetAllToDefault);
             body.appendChild(resetBtn);
-
-            // ربط أحداث تغيير الاسم والملفات
             attachSettingsEvents();
         }
-
         function attachSettingsEvents() {
-            // أحداث تغيير الاسم
             document.querySelectorAll('.app-name-input').forEach(input => {
                 input.addEventListener('input', function() {
                     const index = parseInt(this.dataset.index);
@@ -878,8 +793,6 @@
                     applyAppAppearance(index);
                 });
             });
-
-            // أحداث رفع الصور
             document.querySelectorAll('input[type="file"][data-index]').forEach(fileInput => {
                 fileInput.addEventListener('change', async function(e) {
                     const index = parseInt(this.dataset.index);
@@ -891,41 +804,17 @@
                         customApps[index].iconDataUrl = dataUrl;
                         saveCustomApps();
                         applyAppAppearance(index);
-                        buildSettingsUI(); // إعادة بناء الواجهة لتعكس الصورة الجديدة
-                    } catch (err) {
-                        alert('فشل قراءة الصورة، تأكد من الملف.');
-                    }
+                        buildSettingsUI();
+                    } catch(err) { alert('فشل قراءة الصورة'); }
                 });
             });
         }
-
-        // فتح / إغلاق صفحة الإعدادات
-        function openTikTokSettings() {
-            const settingsDiv = document.getElementById('tiktokSettings');
-            if (!settingsDiv) return;
-            loadCustomApps();
-            buildSettingsUI();
-            settingsDiv.style.display = 'flex';
-        }
-
-        window.closeTikTokSettings = function() {
-            const settingsDiv = document.getElementById('tiktokSettings');
-            if (settingsDiv) settingsDiv.style.display = 'none';
-        };
-
-        // ربط زر تيك توك في الشاشة الرئيسية
-        const tiktokAppItem = Array.from(appItems).find(item => item.querySelector('.app-name').textContent.trim() === 'تيك توك');
-        if (tiktokAppItem) {
-            tiktokAppItem.addEventListener('click', openTikTokSettings);
-        }
-
-        // عند تحميل الصفحة: تحميل الإعدادات وتطبيقها
-        window.addEventListener('load', () => {
-            loadCustomApps();
-            applyAllAppearances();
-        });
+        function openTikTokSettings() { const settingsDiv = document.getElementById('tiktokSettings'); if (!settingsDiv) return; loadCustomApps(); buildSettingsUI(); settingsDiv.style.display = 'flex'; }
+        window.closeTikTokSettings = function() { const settingsDiv = document.getElementById('tiktokSettings'); if (settingsDiv) settingsDiv.style.display = 'none'; };
+        const tiktokAppItem = Array.from(appItems).find(item => item.querySelector('.app-name').textContent.trim() === 'TikTok');
+        if (tiktokAppItem) tiktokAppItem.addEventListener('click', openTikTokSettings);
+        window.addEventListener('load', () => { loadCustomApps(); applyAllAppearances(); });
     })();
 </script>
-
 </body>
 </html>
