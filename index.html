@@ -85,7 +85,7 @@
         .random-range { display: flex; gap: 10px; margin-top: 10px; }
         .random-range input { width: 50%; }
 
-        /* شريط التنقل السفلي - 3 أزرار فقط */
+        /* شريط التنقل السفلي - 3 أزرار بحجم الأصلي (مثل SVG) */
         .main-nav-container {
             position: absolute;
             bottom: 0;
@@ -105,12 +105,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: none;
+            pointer-events: auto;
         }
-        .main-nav-container svg {
-            width: 16px;
-            height: 16px;
-            fill: none;
+        .main-nav-container .nav-item i {
+            font-size: 16px;      /* نفس حجم SVG السابق (16px) */
+            color: white;
+            transition: opacity 0.2s;
+        }
+        .main-nav-container .nav-item i:active {
+            opacity: 0.5;
         }
 
         /* معرض الصور - إطارات منفصلة وزر حذف الكل */
@@ -280,18 +283,16 @@
         </div>
     </div>
 
-    <!-- شريط التنقل - 3 أزرار فقط (بدون الإزار الرابع) -->
+    <!-- شريط التنقل - 3 أزرار بحجم أصلي (Font Awesome بحجم 16px) -->
     <div class="main-nav-container" id="mainNavContainer">
         <div class="nav-item">
-            <svg viewBox="0 0 24 24">
-                <path d="M16 6l-7 7 7 7" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <i class="fas fa-chevron-right"></i>
         </div>
         <div class="nav-item">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2.5" fill="none"/></svg>
+            <i class="far fa-circle"></i>
         </div>
         <div class="nav-item">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke="white" stroke-width="2.5" fill="none"/></svg>
+            <i class="far fa-square"></i>
         </div>
     </div>
 
@@ -304,25 +305,25 @@
         <div class="wa-header"><i class="fas fa-arrow-right" onclick="closeWA()" style="cursor:pointer;"></i> الإعدادات المتطورة</div>
         <div class="wa-body">
             <div class="wa-card">
-                <label style="font-size:12px">الأرقام (رقم في كل سطر):</label><textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates()"></textarea>
+                <label style="font-size:12px">الأرقام (رقم في كل سطر):</label><textarea id="waNumbers" class="wa-input" style="height:100px" oninput="checkDuplicates(); saveAllData()"></textarea>
                 <div id="duplicateAlert" class="duplicateAlert"><button class="clean-btn" onclick="removeDuplicates()">حذف المكرر</button><div id="duplicateText">يوجد أرقام مكررة!</div></div>
-                <div style="display:flex; gap:5px; margin-top:10px"><input type="date" id="dateFrom" class="wa-input" value="2025-12-05"><input type="date" id="dateTo" class="wa-input" value="2026-01-11"></div>
-                <div class="toggle-switch"><label>المبلغ العشوائي (تفعيل/إلغاء)</label><label class="switch"><input type="checkbox" id="randomAmountToggle"><span class="slider"></span></label></div>
-                <div id="fixedAmountDiv"><input type="number" id="fixedTransferAmount" class="wa-input" placeholder="المبلغ الثابت" value="200"></div>
-                <div id="randomAmountDiv" style="display:none;"><div class="random-range"><input type="number" id="minRandomAmount" class="wa-input" placeholder="الحد الأدنى" value="501"><input type="number" id="maxRandomAmount" class="wa-input" placeholder="الحد الأقصى" value="576"></div></div>
-                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="showDateUnderWeather" checked> عرض التاريخ تحت الطقس</label>
-                <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3">
-                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="dateType" checked> تاريخ نصي (الأربعاء...)</label>
+                <div style="display:flex; gap:5px; margin-top:10px"><input type="date" id="dateFrom" class="wa-input" value="2025-12-05" onchange="saveAllData()"><input type="date" id="dateTo" class="wa-input" value="2026-01-11" onchange="saveAllData()"></div>
+                <div class="toggle-switch"><label>المبلغ العشوائي (تفعيل/إلغاء)</label><label class="switch"><input type="checkbox" id="randomAmountToggle" onchange="amountMode = this.checked ? 'random' : 'fixed'; syncAmountUI(); saveAllData();"><span class="slider"></span></label></div>
+                <div id="fixedAmountDiv"><input type="number" id="fixedTransferAmount" class="wa-input" placeholder="المبلغ الثابت" value="200" onchange="saveAllData()"></div>
+                <div id="randomAmountDiv" style="display:none;"><div class="random-range"><input type="number" id="minRandomAmount" class="wa-input" placeholder="الحد الأدنى" value="501" onchange="saveAllData()"><input type="number" id="maxRandomAmount" class="wa-input" placeholder="الحد الأقصى" value="576" onchange="saveAllData()"></div></div>
+                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="showDateUnderWeather" onchange="saveAllData()"> عرض التاريخ تحت الطقس</label>
+                <input type="number" id="fixedFees" class="wa-input" placeholder="رسوم ثابتة" value="3" onchange="saveAllData()">
+                <label style="display:flex; align-items:center; gap:10px; margin-top:10px; color:#008069; font-weight:bold"><input type="checkbox" id="dateType" onchange="saveAllData()"> تاريخ نصي (الأربعاء...)</label>
 
                 <div class="toggle-switch" style="margin-top:12px;">
                     <label>تثبيت الوقت والتاريخ</label>
-                    <label class="switch"><input type="checkbox" id="customOverlayToggle"><span class="slider"></span></label>
+                    <label class="switch"><input type="checkbox" id="customOverlayToggle" onchange="customOverlayEnabled = this.checked; document.getElementById('customOverlayInputs').style.display = customOverlayEnabled ? 'block' : 'none'; if(customOverlayEnabled){ customTimeValue = document.getElementById('customTimeInput').value; customDateValue = document.getElementById('customDateInput').value; } saveAllData();"><span class="slider"></span></label>
                 </div>
                 <div id="customOverlayInputs" style="display:none; margin-top:8px;">
                     <label style="font-size:12px; font-weight:bold;">الساعة الثابتة:</label>
-                    <input type="time" id="customTimeInput" class="wa-input" value="12:00">
+                    <input type="time" id="customTimeInput" class="wa-input" value="12:00" onchange="customTimeValue = this.value; saveAllData()">
                     <label style="font-size:12px; font-weight:bold; margin-top:8px; display:block;">التاريخ الثابت:</label>
-                    <input type="date" id="customDateInput" class="wa-input" value="2026-01-01">
+                    <input type="date" id="customDateInput" class="wa-input" value="2026-01-01" onchange="customDateValue = this.value; saveAllData()">
                 </div>
 
                 <button class="wa-save-btn" onclick="saveWA()">حفظ الإعدادات</button>
@@ -389,7 +390,32 @@
     let customOverlayEnabled = false;
     let customTimeValue = "12:00";
     let customDateValue = "2026-01-01";
-    let navHidden = false; // حالة إخفاء شريط التنقل
+    let navHidden = false;
+
+    // دالة حفظ جميع البيانات (للإعدادات وحالة التطبيق)
+    function saveAllData() {
+        const data = { 
+            h: document.getElementById('clockTime').innerText, 
+            b: batText.innerText, 
+            d: document.getElementById('tempText').innerText, 
+            amount: document.getElementById('amount').innerText, 
+            phone: document.getElementById('phone-num').innerText, 
+            fees: document.getElementById('fees').innerText, 
+            ussdMsg: document.getElementById('ussdMsgInput').value, 
+            pos: ussdBox.style.bottom, 
+            list, fixedFees, fixedTransfer, amountMode, minRandom, maxRandom, 
+            showDateUnderWeather, dateFrom, dateTo, dateTypeChecked, 
+            customOverlayEnabled, customTimeValue, customDateValue,
+            navHidden: navHidden
+        };
+        localStorage.setItem('merged_miui_final', JSON.stringify(data));
+    }
+
+    // ربط الحفظ التلقائي بكل العناصر القابلة للتحرير
+    document.querySelectorAll('.editable-time, .network-speed span, .network-type, .battery-percentage, .editable').forEach(el => {
+        el.addEventListener('input', saveAllData);
+        el.addEventListener('blur', saveAllData);
+    });
 
     const batText = document.getElementById('batText');
     const batLevel = document.getElementById('batLevel');
@@ -416,18 +442,6 @@
     function removeDuplicates() { const area = document.getElementById('waNumbers'); const lines = area.value.split('\n').map(l=>l.trim()).filter(l=>l!==""); area.value=[...new Set(lines)].join('\n'); checkDuplicates(); updateCounter(); saveAllData(); }
     function updateCounter() { const cnt = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!=="").length; document.getElementById('waCounter').innerText = "الأرقام المتبقية: "+cnt; list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!==""); }
     function syncAmountUI(){ const toggle = document.getElementById('randomAmountToggle'); const fixedDiv = document.getElementById('fixedAmountDiv'); const randomDiv = document.getElementById('randomAmountDiv'); if(amountMode === 'random'){ toggle.checked = true; fixedDiv.style.display = 'none'; randomDiv.style.display = 'block'; } else { toggle.checked = false; fixedDiv.style.display = 'block'; randomDiv.style.display = 'none'; } }
-
-    document.getElementById('customOverlayToggle').addEventListener('change', function(e){
-        customOverlayEnabled = this.checked;
-        document.getElementById('customOverlayInputs').style.display = customOverlayEnabled ? 'block' : 'none';
-        if(customOverlayEnabled){
-            customTimeValue = document.getElementById('customTimeInput').value || '12:00';
-            customDateValue = document.getElementById('customDateInput').value || '2026-01-01';
-        }
-        saveAllData();
-    });
-    document.getElementById('customTimeInput').addEventListener('input', function(){ customTimeValue = this.value; saveAllData(); });
-    document.getElementById('customDateInput').addEventListener('input', function(){ customDateValue = this.value; saveAllData(); });
 
     window.saveWA = () => {
         list = document.getElementById('waNumbers').value.split('\n').filter(x=>x.trim()!=="");
@@ -458,8 +472,7 @@
         document.getElementById('minRandomAmount').value = minRandom;
         document.getElementById('maxRandomAmount').value = maxRandom;
         document.getElementById('showDateUnderWeather').checked = showDateUnderWeather;
-        document.getElementById('dateFrom').value = dateFrom;
-        document.getElementById('dateTo').value = dateTo;
+        document.getElementById('dateFrom').value = dateFrom; document.getElementById('dateTo').value = dateTo;
         document.getElementById('dateType').checked = dateTypeChecked;
         document.getElementById('randomAmountToggle').checked = (amountMode === 'random');
         document.getElementById('customOverlayToggle').checked = customOverlayEnabled;
@@ -535,29 +548,52 @@
         saveAllData();
     });
 
-    function saveAllData() {
-        const data = { 
-            h: document.getElementById('clockTime').innerText, 
-            b: batText.innerText, 
-            d: document.getElementById('tempText').innerText, 
-            amount: document.getElementById('amount').innerText, 
-            phone: document.getElementById('phone-num').innerText, 
-            fees: document.getElementById('fees').innerText, 
-            ussdMsg: document.getElementById('ussdMsgInput').value, 
-            pos: ussdBox.style.bottom, 
-            list, fixedFees, fixedTransfer, amountMode, minRandom, maxRandom, 
-            showDateUnderWeather, dateFrom, dateTo, dateTypeChecked, 
-            customOverlayEnabled, customTimeValue, customDateValue,
-            navHidden: navHidden
-        };
-        localStorage.setItem('merged_miui_final', JSON.stringify(data));
-    }
-
-    // ========== معرض الصور ==========
+    // ========== معرض الصور (بدون فقدان الصور، مع ضغط تلقائي) ==========
     let galleryImages = [];
     let currentBgIndex = -1;
 
-    function saveGallery() { try { localStorage.setItem('phone_gallery', JSON.stringify(galleryImages)); if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex); } catch(e) { console.log('التخزين ممتلئ'); } }
+    // ضغط الصورة قبل التخزين
+    function compressImage(file, maxWidth = 800, quality = 0.5) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressedDataUrl);
+                };
+                img.onerror = reject;
+            };
+            reader.onerror = reject;
+        });
+    }
+
+    function saveGallery() {
+        try {
+            localStorage.setItem('phone_gallery', JSON.stringify(galleryImages));
+            if(currentBgIndex>=0) localStorage.setItem('phone_bg_index', currentBgIndex);
+        } catch(e) {
+            if(e.name === 'QuotaExceededError') {
+                alert("مساحة التخزين ممتلئة! يرجى حذف بعض الصور أو تقليل حجمها.");
+            } else {
+                console.log('خطأ في الحفظ:', e);
+            }
+        }
+    }
+
     function loadGallery() {
         const stored = localStorage.getItem('phone_gallery');
         if(stored) galleryImages = JSON.parse(stored);
@@ -567,6 +603,7 @@
         applyBackground();
         renderGallery();
     }
+
     function applyBackground() {
         if(currentBgIndex<0 || !galleryImages[currentBgIndex]) return;
         const img = galleryImages[currentBgIndex];
@@ -575,13 +612,28 @@
         bgLayer.style.backgroundSize = img.size || "cover";
         saveGallery();
     }
-    function addImages(files) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => { galleryImages.push({ url: e.target.result, pos: "50% 50%", size: "cover" }); renderGallery(); saveGallery(); };
-            reader.readAsDataURL(file);
-        });
+
+    async function addImages(files) {
+        for (const file of files) {
+            try {
+                const compressedUrl = await compressImage(file);
+                galleryImages.push({ url: compressedUrl, pos: "50% 50%", size: "cover" });
+            } catch(err) {
+                console.log("فشل ضغط الصورة", err);
+                // fallback: استخدام الصورة كما هي
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = e => {
+                    galleryImages.push({ url: e.target.result, pos: "50% 50%", size: "cover" });
+                    renderGallery();
+                    saveGallery();
+                };
+            }
+        }
+        renderGallery();
+        saveGallery();
     }
+
     function deleteImage(idx) { 
         if(confirm("حذف الصورة نهائياً؟")){ 
             galleryImages.splice(idx,1); 
@@ -591,6 +643,7 @@
             applyBackground(); renderGallery(); saveGallery(); 
         } 
     }
+
     function deleteAllImages() {
         if(confirm("هل أنت متأكد من حذف جميع الصور؟ ستبقى الخلفية الافتراضية فقط.")) {
             galleryImages = [{ url: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2000", pos: "50% 50%", size: "cover" }];
@@ -598,7 +651,9 @@
             applyBackground(); renderGallery(); saveGallery();
         }
     }
+
     function setBackground(idx) { currentBgIndex = idx; applyBackground(); renderGallery(); saveGallery(); }
+
     function renderGallery() {
         const grid = document.getElementById('galleryGrid'); 
         if(!grid) return;
@@ -619,6 +674,7 @@
             grid.appendChild(div);
         });
     }
+
     function openGallery() { renderGallery(); document.getElementById('galleryModal').style.display='flex'; }
     function closeGallery() { document.getElementById('galleryModal').style.display='none'; }
     function randomBackground() { if(galleryImages.length) setBackground(Math.floor(Math.random()*galleryImages.length)); }
@@ -699,7 +755,6 @@
             document.getElementById('customDateInput').value = customDateValue;
             syncAmountUI();
             updateCounter();
-            // استعادة حالة شريط التنقل
             const navContainer = document.getElementById('mainNavContainer');
             if (navContainer) navContainer.style.display = navHidden ? 'none' : 'flex';
         } else { syncAmountUI(); }
